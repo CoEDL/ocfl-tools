@@ -1,0 +1,24 @@
+{
+    "name": "modpdsc-ocfl-indexer",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "develop": "npm install --no-progress && node_modules/.bin/webpack-dev-server --config webpack.develop.js --hot --inline",
+        "build:production": "npm install --no-progress && node_modules/.bin/webpack --config webpack.production.js",
+        "unitTests": "npm install && node_modules/mocha/bin/mocha -w -r jsdom-global/register 'src/**/*.spec.js'"
+    },
+    "repository": {
+        "type": "git",
+        "url": ";"
+    },
+    "author": "Marco La Rosa",
+    "license": "ISC",
+    "dependencies": {
+        "request": "^2.88.0",
+        "request-promise-native": "^1.0.7",
+        "walk": "^2.3.14",
+        "yargs": "^14.0.0"
+    },
+    "devDependencies": {}
+}
