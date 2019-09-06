@@ -1,0 +1,103 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://ocfl-indexer/item.schema.json",
+    "title": "Item",
+    "description": "An item ingested in to OCFL",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "string"
+        },
+        "schema:additionalType": {
+            "type": "string",
+            "const": "item"
+        },
+        "name": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "author": {
+            "type": "object",
+            "properties": {
+                "familyName": {
+                    "type": "string"
+                },
+                "givenName": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "geo": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "const": "GeoShape"
+                },
+                "box": {
+                    "type": "string"
+                }
+            }
+        },
+        "hasPart": {
+            "type": "array",
+            "items": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                },
+                "required": ["id"]
+            }
+        },
+        "identifier": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "string"
+                    }
+                },
+                "required": ["type", "name"]
+            },
+            "contains": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "const": "PropertyValue"
+                    },
+                    "name": {
+                        "enum": ["domain", "itemIdentifier"]
+                    }
+                }
+            }
+        },
+        "memberOf": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "required": [
+        "id",
+        "schema:additionalType",
+        "name",
+        "author",
+        "identifier",
+        "memberOf"
+    ]
+}
