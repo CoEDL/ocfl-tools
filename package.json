@@ -15,6 +15,7 @@
     "author": "Marco La Rosa",
     "license": "ISC",
     "dependencies": {
+        "@elastic/elasticsearch": "^7.3.0",
         "ajv": "^6.10.2",
         "jsonld": "^1.7.0",
         "lodash": "^4.17.15",

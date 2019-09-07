@@ -7,6 +7,7 @@ const readFile = util.promisify(require("fs").readFile);
 const rp = require("request-promise-native");
 const path = require("path");
 const JSON_LOADER = require("./jsonld-loader");
+const { Client } = require("@elastic/elasticsearch");
 
 const args = yargs.scriptName("OCFL Indexer").options({
     source: {
@@ -18,9 +19,26 @@ const args = yargs.scriptName("OCFL Indexer").options({
         demandOption: true,
         describe: "the URL to the elastic search service",
         type: "string"
+    },
+    username: {
+        demandOption: true,
+        describe: "The username to log in to elastic with",
+        type: "string"
+    },
+    password: {
+        demandOption: true,
+        describe: "The password to log in to elastic with",
+        type: "string"
     }
 }).argv;
 
+const elasticClient = new Client({
+    node: args.search,
+    auth: {
+        username: args.username,
+        password: args.password
+    }
+});
 let walker = walk.walk(args.source, {});
 
 const loader = new JSON_LOADER();
@@ -38,6 +56,9 @@ walker.on("file", async (root, fileStats, next) => {
         });
         await loader.objectify();
         loader.verify();
+        data = loader.objectified;
+        await createIndexAndLoadMapping({ data });
+        // console.log(data);
     }
     next();
 });
@@ -46,6 +67,25 @@ walker.on("errors", (root, nodeStatsArray, next) => {
 });
 
 walker.on("end", () => {});
+
+async function createIndexAndLoadMapping({ data }) {
+    console.log(data);
+    let domain = data.identifier.filter(d => d.name === "domain")[0].value;
+    try {
+        let index = await elasticClient.indices.get({ index: domain });
+    } catch (error) {
+        await elasticClient.indices.create({ index: domain });
+        // no such index - create it
+    }
+    //     await elasticClient.index({
+    //         index: 'game-of-thrones',
+    //         // type: '_doc', // uncomment this line if you are using Elasticsearch ≤ 6
+    //         body: {
+    //           character: 'Daenerys Targaryen',
+    //           quote: 'I am the blood of the dragon.'
+    //         }
+    //       })
+}
 
 // (async () => {
 //     let path = `myindex `;
