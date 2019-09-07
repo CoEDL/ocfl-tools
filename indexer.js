@@ -8,6 +8,7 @@ const rp = require("request-promise-native");
 const path = require("path");
 const JSON_LOADER = require("./jsonld-loader");
 const { Client } = require("@elastic/elasticsearch");
+const { mappings } = require("./mappings");
 
 const args = yargs.scriptName("OCFL Indexer").options({
     source: {
@@ -69,12 +70,15 @@ walker.on("errors", (root, nodeStatsArray, next) => {
 walker.on("end", () => {});
 
 async function createIndexAndLoadMapping({ data }) {
-    console.log(data);
     let domain = data.identifier.filter(d => d.name === "domain")[0].value;
     try {
         let index = await elasticClient.indices.get({ index: domain });
     } catch (error) {
         await elasticClient.indices.create({ index: domain });
+        await elasticClient.indices.putMapping({
+            index: domain,
+            body: mappings
+        });
         // no such index - create it
     }
     //     await elasticClient.index({
