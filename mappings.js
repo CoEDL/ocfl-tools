@@ -3,6 +3,7 @@
 module.exports = {
     mappings: {
         properties: {
+            "schema:additionalType": { type: "keyword" },
             name: { type: "text" },
             description: { type: "text" },
             author: {
