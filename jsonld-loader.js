@@ -26,7 +26,7 @@ class JSONLD_LOADER {
 
     verify() {
         const data = { ...this.objectified };
-        console.log(JSON.stringify(data, null, 2));
+        // console.log(JSON.stringify(data, null, 2));
         if (data["schema:additionalType"] === "item") {
             console.info(`Verifying item data structure`);
             const valid = ajv.validate(this.itemSchema, data);
