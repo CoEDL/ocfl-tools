@@ -67,7 +67,12 @@
                         "const": "PropertyValue"
                     },
                     "name": {
-                        "enum": ["domain", "collectionIdentifier"]
+                        "enum": [
+                            "domain",
+                            "id",
+                            "hashId",
+                            "collectionIdentifier"
+                        ]
                     }
                 }
             }
