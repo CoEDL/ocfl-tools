@@ -59,6 +59,7 @@ walker.on("file", async (root, fileStats, next) => {
         loader.verify();
         data = loader.objectified;
         await createIndexAndLoadMapping({ data });
+        await indexDocument({ data });
         // console.log(data);
     }
     next();
@@ -70,36 +71,21 @@ walker.on("errors", (root, nodeStatsArray, next) => {
 walker.on("end", () => {});
 
 async function createIndexAndLoadMapping({ data }) {
-    let domain = data.identifier.filter(d => d.name === "domain")[0].value;
+    let index = data.identifier.filter(d => d.name === "domain")[0].value;
     try {
-        let index = await elasticClient.indices.get({ index: domain });
+        await elasticClient.indices.get({ index });
     } catch (error) {
-        await elasticClient.indices.create({ index: domain });
+        await elasticClient.indices.create({ index });
         await elasticClient.indices.putMapping({
-            index: domain,
+            index,
             body: mappings
         });
-        // no such index - create it
     }
-    //     await elasticClient.index({
-    //         index: 'game-of-thrones',
-    //         // type: '_doc', // uncomment this line if you are using Elasticsearch ≤ 6
-    //         body: {
-    //           character: 'Daenerys Targaryen',
-    //           quote: 'I am the blood of the dragon.'
-    //         }
-    //       })
 }
 
-// (async () => {
-//     let path = `myindex `;
-//     const options = {
-//         auth: {
-//             user: "indexer",
-//             pass: "somerandompassword"
-//         },
-//         uri: `${args.search}/${path}`,
-//         method: "PUT"
-//     };
-//     return await rp(options);
-// })();
+async function indexDocument({ data }) {
+    let index = data.identifier.filter(d => d.name === "domain")[0].value;
+    let id = data.identifier.filter(d => d.name === "hashId")[0].value;
+    console.info(`Indexing as ${index}/${id}`);
+    await elasticClient.index({ id, index, body: data });
+}
