@@ -71,7 +71,9 @@ walker.on("errors", (root, nodeStatsArray, next) => {
 walker.on("end", () => {});
 
 async function createIndexAndLoadMapping({ data }) {
-    let index = data.identifier.filter(d => d.name === "domain")[0].value;
+    let index = data.identifier
+        .filter(d => d.name === "domain")[0]
+        .value.toLowerCase();
     try {
         await elasticClient.indices.get({ index });
     } catch (error) {
@@ -84,7 +86,9 @@ async function createIndexAndLoadMapping({ data }) {
 }
 
 async function indexDocument({ data }) {
-    let index = data.identifier.filter(d => d.name === "domain")[0].value;
+    let index = data.identifier
+        .filter(d => d.name === "domain")[0]
+        .value.toLowerCase();
     let id = data.identifier.filter(d => d.name === "hashId")[0].value;
     console.info(`Indexing as ${index}/${id}`);
     await elasticClient.index({ id, index, body: data });
