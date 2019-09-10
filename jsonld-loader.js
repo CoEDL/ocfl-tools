@@ -61,8 +61,8 @@ class JSONLD_LOADER {
                         let element = content.filter(
                             c => c["@id"] === v["@id"]
                         )[0];
-                        // v = { ...v, ...element };
-                        // console.log(element);
+                        delete v["@id"];
+                        if (element) delete element["@id"];
                         v = { ...v, ...element };
                     }
                     return v;
