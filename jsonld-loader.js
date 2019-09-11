@@ -7,6 +7,12 @@ const util = require("util");
 const readFile = util.promisify(require("fs").readFile);
 const ajv = new Ajv();
 
+const maintainIds = [
+    "http://pcdm.org/models#hasMember",
+    "http://schema.org/memberOf",
+    "http://schema.org/hasPart"
+];
+
 class JSONLD_LOADER {
     constructor() {
         (async () => {
@@ -25,6 +31,7 @@ class JSONLD_LOADER {
     }
 
     verify() {
+        let verified = true;
         const data = { ...this.objectified };
         // console.log(JSON.stringify(data, null, 2));
         if (data["schema:additionalType"] === "item") {
@@ -38,10 +45,15 @@ class JSONLD_LOADER {
         } else {
             console.error(`Unknown input type - don't know how to handle this`);
         }
+        return verified;
 
         function logErrors(errors) {
+            verified = false;
             console.log("Errors:");
-            errors.forEach(e => console.error(`  - ${e.message}`));
+            errors.forEach(e => {
+                console.error(`  - ${JSON.stringify(e, null, 2)}`);
+                console.error("");
+            });
         }
     }
 
@@ -50,18 +62,16 @@ class JSONLD_LOADER {
 
         let objectRoot = data.filter(e => e["@id"] === "./")[0];
         let content = data.filter(e => e["@id"] !== "./");
-        // console.log(objectRoot);
 
         let root = {};
         map(objectRoot, (values, rootElement) => {
             if (isArray(values)) {
                 values = values.map(v => {
                     if (isObject(v) && v["@id"]) {
-                        // console.log(v["@id"]);
                         let element = content.filter(
                             c => c["@id"] === v["@id"]
                         )[0];
-                        delete v["@id"];
+                        if (!maintainIds.includes(rootElement)) delete v["@id"];
                         if (element) delete element["@id"];
                         v = { ...v, ...element };
                     }
