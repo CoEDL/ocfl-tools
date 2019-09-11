@@ -56,10 +56,13 @@ walker.on("file", async (root, fileStats, next) => {
             data
         });
         await loader.objectify();
-        loader.verify();
-        data = loader.objectified;
-        await createIndexAndLoadMapping({ data });
-        await indexDocument({ data });
+        if (!loader.verify()) {
+            console.error(`Crate didn't verify - skipping indexing.`);
+        } else {
+            data = loader.objectified;
+            await createIndexAndLoadMapping({ data });
+            await indexDocument({ data });
+        }
         // console.log(data);
     }
     next();
