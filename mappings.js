@@ -6,6 +6,8 @@ module.exports = {
             "schema:additionalType": { type: "keyword" },
             name: { type: "text" },
             description: { type: "text" },
+            dateCreated: { type: "date" },
+            dateModified: { type: "date" },
             author: {
                 type: "nested",
                 properties: {
@@ -25,7 +27,9 @@ module.exports = {
                     duration: { type: "long" },
                     contentSize: { type: "long" },
                     bitrate: { type: "integer" },
-                    encodingFormat: { type: "keyword" }
+                    encodingFormat: { type: "keyword" },
+                    dateCreated: { type: "date" },
+                    dateModified: { type: "date" }
                 }
             }
         }
