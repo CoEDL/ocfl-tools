@@ -78,10 +78,18 @@
             }
         },
         "http://pcdm.org/models#hasMember": {
-            "type": "object",
+            "type": ["object", "array"],
             "properties": {
                 "id": {
                     "type": "string"
+                }
+            },
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
                 }
             }
         }
