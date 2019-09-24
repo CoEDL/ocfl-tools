@@ -44,7 +44,7 @@
             }
         },
         "hasPart": {
-            "type": "array",
+            "type": ["array", "object"],
             "items": {
                 "properties": {
                     "id": {
