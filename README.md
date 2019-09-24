@@ -5,6 +5,7 @@
   - [Data Validation](#data-validation)
   - [Important](#important)
   - [Running the indexer in development](#running-the-indexer-in-development)
+  - [Running the tests](#running-the-tests)
 
 ## About
 
@@ -40,4 +41,20 @@ When the development cluster starts the elastic service will be empty. To popula
 
 In development, the elastic service is configured with a user `indexer` that has superuser access to the service with a password of `somerandompassword`.
 
+## Running the tests
 
+Tests need to run inside the a linux container so you first need to start it.
+
+```
+> docker-compose up -d
+```
+
+The first time, install the modules, viz:
+```
+> ./run-tests.sh --install
+```
+
+After that (assuming you haven't added any tests):
+```
+> ./run-tests.sh
+```
