@@ -6,7 +6,7 @@
     "scripts": {
         "develop": "npm install --no-progress && node_modules/.bin/webpack-dev-server --config webpack.develop.js --hot --inline",
         "build:production": "npm install --no-progress && node_modules/.bin/webpack --config webpack.production.js",
-        "unitTests": "npm install && node_modules/mocha/bin/mocha -w -r jsdom-global/register 'src/**/*.spec.js'"
+        "test": "jest --coverage"
     },
     "repository": {
         "type": "git",
@@ -24,5 +24,12 @@
         "walk": "^2.3.14",
         "yargs": "^14.0.0"
     },
-    "devDependencies": {}
+    "devDependencies": {
+        "@babel/cli": "^7.6.2",
+        "@babel/core": "^7.6.2",
+        "@babel/plugin-syntax-dynamic-import": "^7.2.0",
+        "@babel/preset-env": "^7.6.2",
+        "babel-jest": "^24.9.0",
+        "jest": "^24.9.0"
+    }
 }
