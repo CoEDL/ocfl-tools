@@ -1,9 +1,9 @@
 "use strict";
 
-import { JSON_LOADER } from "./jsonld-loader.js";
+const JSON_LOADER = require("./jsonld-loader.js");
 const loader = new JSON_LOADER();
-import util from "util";
-import path from "path";
+const util = require("util");
+const path = require("path");
 const readFile = util.promisify(require("fs").readFile);
 
 test("test COLLECTION-ro-crate-metadata.copy.jsonld can be objectified", async () => {

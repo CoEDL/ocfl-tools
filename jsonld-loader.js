@@ -13,7 +13,7 @@ const maintainIds = [
     "http://schema.org/hasPart"
 ];
 
-export class JSON_LOADER {
+class JSON_LOADER {
     constructor() {
         (async () => {
             this.itemSchema = JSON.parse(await readFile("./item.schema.json"));
@@ -138,3 +138,5 @@ export class JSON_LOADER {
         }
     }
 }
+
+module.exports = JSON_LOADER;
