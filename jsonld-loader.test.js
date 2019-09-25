@@ -4,10 +4,9 @@ import { JSON_LOADER } from "./jsonld-loader.js";
 const loader = new JSON_LOADER();
 import util from "util";
 import path from "path";
-import { exportAllDeclaration } from "@babel/types";
 const readFile = util.promisify(require("fs").readFile);
 
-test("test COLLECTION-ro-crate-metadata.copy.jsonld", async () => {
+test("test COLLECTION-ro-crate-metadata.copy.jsonld can be objectified", async () => {
     const filename = "COLLECTION-ro-crate-metadata.copy.jsonld";
     const filepath = "./example-crates";
     let data = JSON.parse(await readFile(path.join(filepath, filename)));
@@ -29,4 +28,50 @@ test("test COLLECTION-ro-crate-metadata.copy.jsonld", async () => {
             name: "Erakor, Lelepa"
         }
     });
+});
+
+test("test COLLECTION-ro-crate-metadata.jsonld verifies", async () => {
+    const filename = "COLLECTION-ro-crate-metadata.jsonld";
+    const filepath = "./example-crates";
+    let data = JSON.parse(await readFile(path.join(filepath, filename)));
+    loader.init({ path: filepath, filename, data });
+    await loader.objectify();
+    expect(() => {
+        loader.verify({ quiet: true });
+    }).not.toThrow();
+});
+
+test("test COLLECTION-ro-crate-metadata.jsonld does not verify", async () => {
+    const filename = "COLLECTION-ro-crate-metadata.jsonld";
+    const filepath = "./example-crates";
+    let data = JSON.parse(await readFile(path.join(filepath, filename)));
+    loader.init({ path: filepath, filename, data });
+    await loader.objectify();
+    loader.objectified.id = "/";
+    expect(() => {
+        loader.verify({ quiet: true });
+    }).toThrow();
+});
+
+test("test ITEM-ro-crate-metadata.jsonld verifies", async () => {
+    const filename = "ITEM-ro-crate-metadata.jsonld";
+    const filepath = "./example-crates";
+    let data = JSON.parse(await readFile(path.join(filepath, filename)));
+    loader.init({ path: filepath, filename, data });
+    await loader.objectify();
+    expect(() => {
+        loader.verify({ quiet: true });
+    }).not.toThrow();
+});
+
+test("test ITEM-ro-crate-metadata.jsonld does not verify", async () => {
+    const filename = "ITEM-ro-crate-metadata.jsonld";
+    const filepath = "./example-crates";
+    let data = JSON.parse(await readFile(path.join(filepath, filename)));
+    loader.init({ path: filepath, filename, data });
+    await loader.objectify();
+    loader.objectified.id = "/";
+    expect(() => {
+        loader.verify({ quiet: true });
+    }).toThrow();
 });

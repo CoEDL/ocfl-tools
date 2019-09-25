@@ -30,24 +30,34 @@ export class JSON_LOADER {
         this.objectified = undefined;
     }
 
-    verify() {
+    verify({ quiet = false }) {
         let verified = true;
         const data = { ...this.objectified };
         // console.log(JSON.stringify(data, null, 2));
         if (data["schema:additionalType"] === "item") {
-            console.info(`Verifying item data structure`);
+            if (!quiet) console.info(`Verifying item data structure`);
             const valid = ajv.validate(this.itemSchema, data);
-            if (!valid) logErrors(ajv.errors);
+            if (!valid) {
+                logErrors(ajv.errors);
+                throw new Error("Item crate did not verify");
+            }
         } else if (data["schema:additionalType"] === "collection") {
-            console.info(`Verifying collection data structure`);
+            if (!quiet) console.info(`Verifying collection data structure`);
             const valid = ajv.validate(this.collectionSchema, data);
-            if (!valid) logErrors(ajv.errors);
+            if (!valid) {
+                logErrors(ajv.errors);
+                throw new Error("Collection crate did not verify");
+            }
         } else {
-            console.error(`Unknown input type - don't know how to handle this`);
+            if (!quiet)
+                console.error(
+                    `Unknown input type - don't know how to handle this`
+                );
         }
         return verified;
 
         function logErrors(errors) {
+            if (quiet) return;
             verified = false;
             console.log("Errors:");
             errors.forEach(e => {
@@ -73,16 +83,17 @@ export class JSON_LOADER {
         // console.log(JSON.stringify(content, null, 2));
 
         let rootProperties = Object.keys(root);
-        for (let prop of rootProperties) {
-            let item = root[prop];
+        for (let property of rootProperties) {
+            let item = root[property];
             if (isArray(item)) {
-                item = mapContent({ item, content });
-                root[prop] = [...item];
+                item = mapContent({ property, item, content });
+                root[property] = [...item];
             }
         }
         // console.log(JSON.stringify(root, null, 2));
 
         this.objectified = await compact(root);
+        // console.log(JSON.stringify(this.objectified, null, 2));
 
         async function compact(root) {
             return await jsonld.compact(
@@ -99,7 +110,7 @@ export class JSON_LOADER {
             );
         }
 
-        function mapContent({ item, content }) {
+        function mapContent({ property, item, content }) {
             item = item.map(entry => {
                 if (entry["@id"]) {
                     let entryData = content.filter(
@@ -111,12 +122,13 @@ export class JSON_LOADER {
                         for (let prop of properties) {
                             if (isArray(entryData[prop]))
                                 entryData[prop] = mapContent({
+                                    property: prop,
                                     item: entryData[prop],
                                     content
                                 });
                         }
                         entry = { ...entry, ...entryData };
-                        if (!maintainIds.includes(entry["@id"]))
+                        if (!maintainIds.includes(property))
                             delete entry["@id"];
                     }
                 }
@@ -124,26 +136,5 @@ export class JSON_LOADER {
             });
             return item;
         }
-
-        // map(objectRoot, (values, rootElement) => {
-        //     if (isArray(values)) {
-        //         values = values.map(v => {
-        //             if (isObject(v) && v["@id"]) {
-        //                 let element = content.filter(
-        //                     c => c["@id"] === v["@id"]
-        //                 )[0];
-        //                 if (!maintainIds.includes(rootElement)) delete v["@id"];
-        //                 if (element) delete element["@id"];
-        //                 v = { ...v, ...element };
-        //             }
-        //             return v;
-        //         });
-        //     }
-        //     root[rootElement] = values;
-        // });
-        // this.objectified = await jsonld.compact(root, {
-        //     "@context": "http://schema.org"
-        // });
-        // // console.log(JSON.stringify(this.objectified, null, 2));
     }
 }
