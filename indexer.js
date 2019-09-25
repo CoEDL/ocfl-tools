@@ -56,10 +56,12 @@ walker.on("file", async (root, fileStats, next) => {
             data
         });
         await loader.objectify();
+        // console.log(JSON.stringify(loader.objectified, null, 2));
         if (!loader.verify({ quiet: false })) {
             console.error(`Crate didn't verify - skipping indexing.`);
         } else {
             data = loader.objectified;
+            data = refactorGeoShape({ data });
             await createIndexAndLoadMapping({ data });
             await indexDocument({ data });
         }
@@ -89,10 +91,24 @@ async function createIndexAndLoadMapping({ data }) {
 }
 
 async function indexDocument({ data }) {
+    // console.log(JSON.stringify(data, null, 2));
     let index = data.identifier
         .filter(d => d.name === "domain")[0]
         .value.toLowerCase();
     let id = data.identifier.filter(d => d.name === "hashId")[0].value;
     console.info(`Indexing as ${index}/${id}`);
     await elasticClient.index({ id, index, body: data });
+}
+
+function refactorGeoShape({ data }) {
+    let shape = data.contentLocation.geo.box;
+    let coordinates = [
+        shape.split(" ")[0].split(","),
+        shape.split(" ")[1].split(",")
+    ];
+    data.contentLocation = {
+        type: "envelope",
+        coordinates
+    };
+    return data;
 }
