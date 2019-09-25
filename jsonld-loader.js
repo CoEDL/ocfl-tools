@@ -13,7 +13,7 @@ const maintainIds = [
     "http://schema.org/hasPart"
 ];
 
-class JSONLD_LOADER {
+export class JSON_LOADER {
     constructor() {
         (async () => {
             this.itemSchema = JSON.parse(await readFile("./item.schema.json"));
@@ -23,9 +23,9 @@ class JSONLD_LOADER {
         })();
     }
 
-    init({ path, name, data }) {
+    init({ path, filename, data }) {
         this.path = path;
-        this.name = name;
+        this.name = filename;
         this.data = data;
         this.objectified = undefined;
     }
@@ -58,33 +58,92 @@ class JSONLD_LOADER {
     }
 
     async objectify() {
-        let data = (await jsonld.expand(this.data))[0]["@graph"];
+        let data = await jsonld.expand(this.data);
+        // console.log(JSON.stringify(data, null, 2));
 
-        let objectRoot = data.filter(e => e["@id"] === "./")[0];
-        let content = data.filter(e => e["@id"] !== "./");
+        let root = data.filter(i => {
+            if (i["@type"])
+                return i["@type"].includes("http://schema.org/Dataset");
+        })[0];
+        let content = data.filter(i => {
+            if (i["@type"])
+                return !i["@type"].includes("http://schema.org/Dataset");
+            return i;
+        });
+        // console.log(JSON.stringify(content, null, 2));
 
-        let root = {};
-        map(objectRoot, (values, rootElement) => {
-            if (isArray(values)) {
-                values = values.map(v => {
-                    if (isObject(v) && v["@id"]) {
-                        let element = content.filter(
-                            c => c["@id"] === v["@id"]
-                        )[0];
-                        if (!maintainIds.includes(rootElement)) delete v["@id"];
-                        if (element) delete element["@id"];
-                        v = { ...v, ...element };
-                    }
-                    return v;
-                });
+        let rootProperties = Object.keys(root);
+        for (let prop of rootProperties) {
+            let item = root[prop];
+            if (isArray(item)) {
+                item = mapContent({ item, content });
+                root[prop] = [...item];
             }
-            root[rootElement] = values;
-        });
-        this.objectified = await jsonld.compact(root, {
-            "@context": "http://schema.org"
-        });
-        // console.log(JSON.stringify(this.objectified, null, 2));
+        }
+        // console.log(JSON.stringify(root, null, 2));
+
+        this.objectified = await compact(root);
+
+        async function compact(root) {
+            return await jsonld.compact(
+                root,
+                {
+                    "@context": "https://schema.org"
+                },
+                {
+                    base: null,
+                    // compactArrays: false,
+                    compactToRelative: true,
+                    skipExpansion: true
+                }
+            );
+        }
+
+        function mapContent({ item, content }) {
+            item = item.map(entry => {
+                if (entry["@id"]) {
+                    let entryData = content.filter(
+                        c => c["@id"] === entry["@id"]
+                    )[0];
+
+                    if (entryData) {
+                        let properties = Object.keys(entryData);
+                        for (let prop of properties) {
+                            if (isArray(entryData[prop]))
+                                entryData[prop] = mapContent({
+                                    item: entryData[prop],
+                                    content
+                                });
+                        }
+                        entry = { ...entry, ...entryData };
+                        if (!maintainIds.includes(entry["@id"]))
+                            delete entry["@id"];
+                    }
+                }
+                return entry;
+            });
+            return item;
+        }
+
+        // map(objectRoot, (values, rootElement) => {
+        //     if (isArray(values)) {
+        //         values = values.map(v => {
+        //             if (isObject(v) && v["@id"]) {
+        //                 let element = content.filter(
+        //                     c => c["@id"] === v["@id"]
+        //                 )[0];
+        //                 if (!maintainIds.includes(rootElement)) delete v["@id"];
+        //                 if (element) delete element["@id"];
+        //                 v = { ...v, ...element };
+        //             }
+        //             return v;
+        //         });
+        //     }
+        //     root[rootElement] = values;
+        // });
+        // this.objectified = await jsonld.compact(root, {
+        //     "@context": "http://schema.org"
+        // });
+        // // console.log(JSON.stringify(this.objectified, null, 2));
     }
 }
-
-module.exports = JSONLD_LOADER;
