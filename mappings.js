@@ -4,10 +4,13 @@ module.exports = {
     mappings: {
         properties: {
             "schema:additionalType": { type: "keyword" },
+            "@context": { enabled: false },
+            type: { enabled: false },
+            id: { enabled: false },
             name: { type: "text" },
             description: { type: "text" },
-            dateCreated: { type: "date" },
-            dateModified: { type: "date" },
+            "schema:dateCreated": { type: "date" },
+            "schema:dateModified": { type: "date" },
             author: {
                 type: "nested",
                 properties: {
@@ -28,8 +31,20 @@ module.exports = {
                     contentSize: { type: "long" },
                     bitrate: { type: "integer" },
                     encodingFormat: { type: "keyword" },
-                    dateCreated: { type: "date" },
-                    dateModified: { type: "date" }
+                    "schema:dateCreated": { type: "date" },
+                    "schema:dateModified": { type: "date" }
+                }
+            },
+            publisher: {
+                type: "nested",
+                properties: {
+                    name: { type: "keyword" }
+                }
+            },
+            contentLocation: {
+                type: "nested",
+                properties: {
+                    geo: { type: "geo_shape" }
                 }
             }
         }
