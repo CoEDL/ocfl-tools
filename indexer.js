@@ -56,7 +56,7 @@ walker.on("file", async (root, fileStats, next) => {
             data
         });
         await loader.objectify();
-        if (!loader.verify()) {
+        if (!loader.verify({ quiet: false })) {
             console.error(`Crate didn't verify - skipping indexing.`);
         } else {
             data = loader.objectified;
