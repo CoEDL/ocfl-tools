@@ -6,7 +6,7 @@
     "type": "object",
     "properties": {
         "id": {
-            "type": "string"
+            "const": "./"
         },
         "schema:additionalType": {
             "type": "string",
@@ -32,14 +32,22 @@
                 }
             }
         },
-        "geo": {
+        "contentLocation": {
             "type": "object",
             "properties": {
                 "type": {
-                    "const": "GeoShape"
+                    "const": "Place"
                 },
-                "box": {
-                    "type": "string"
+                "geo": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "const": "GeoShape"
+                        },
+                        "box": {
+                            "type": "string"
+                        }
+                    }
                 }
             }
         },
