@@ -1,6 +1,6 @@
 "use strict";
 
-const { map, isArray, isObject } = require("lodash");
+const { isArray, isPlainObject } = require("lodash");
 const jsonld = require("jsonld");
 const Ajv = require("ajv");
 const util = require("util");
@@ -135,6 +135,25 @@ class JSON_LOADER {
                 return entry;
             });
             return item;
+        }
+    }
+
+    remap() {
+        this.objectified.contributor = flattenContributor({
+            contributor: this.objectified.contributor
+        });
+
+        function flattenContributor({ contributor }) {
+            if (isPlainObject(contributor)) {
+                contributor = [contributor];
+            }
+            contributor = contributor.map(c => {
+                return {
+                    name: c.contributor.name,
+                    role: c.name
+                };
+            });
+            return contributor;
         }
     }
 }
