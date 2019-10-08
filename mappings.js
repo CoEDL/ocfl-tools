@@ -17,6 +17,13 @@ module.exports = {
                     name: { type: "keyword" }
                 }
             },
+            contributor: {
+                type: "nested",
+                properties: {
+                    name: { type: "keyword" },
+                    role: { type: "keyword" }
+                }
+            },
             identifier: {
                 type: "nested",
                 properties: {
