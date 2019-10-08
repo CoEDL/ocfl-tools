@@ -32,6 +32,32 @@
                 }
             }
         },
+        "contributor": {
+            "type": ["array", "object"],
+            "items": {
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "const": "Role"
+                    },
+                    "contributor": {
+                        "properties": {
+                            "familyName": {
+                                "type": "string"
+                            },
+                            "givenName": {
+                                "type": "string"
+                            },
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "name": { "type": "string" }
+                },
+                "required": ["name", "contributor", "type"]
+            }
+        },
         "contentLocation": {
             "type": "object",
             "properties": {
