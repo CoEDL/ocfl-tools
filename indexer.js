@@ -60,6 +60,7 @@ walker.on("file", async (root, fileStats, next) => {
         if (!loader.verify({ quiet: false })) {
             console.error(`Crate didn't verify - skipping indexing.`);
         } else {
+            loader.remap();
             data = loader.objectified;
             data = refactorGeoShape({ data });
             await createIndexAndLoadMapping({ data });
