@@ -6,6 +6,8 @@ const Ajv = require("ajv");
 const util = require("util");
 const readFile = util.promisify(require("fs").readFile);
 const ajv = new Ajv();
+const fs = require("fs");
+const context = JSON.parse(fs.readFileSync("./jsonldcontext.jsonld"));
 
 const maintainIds = [
     "http://pcdm.org/models#hasMember",
@@ -96,18 +98,12 @@ class JSON_LOADER {
         // console.log(JSON.stringify(this.objectified, null, 2));
 
         async function compact(root) {
-            return await jsonld.compact(
-                root,
-                {
-                    "@context": "https://schema.org"
-                },
-                {
-                    base: null,
-                    // compactArrays: false,
-                    compactToRelative: true,
-                    skipExpansion: true
-                }
-            );
+            return await jsonld.compact(root, context, {
+                base: null,
+                // compactArrays: false,
+                compactToRelative: true,
+                skipExpansion: true
+            });
         }
 
         function mapContent({ property, item, content }) {
