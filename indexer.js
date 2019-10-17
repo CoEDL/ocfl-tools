@@ -10,7 +10,7 @@ const path = require("path");
 const Pool = require("multiprocessing").Pool;
 
 // total number of work processes
-const numberOfWalkers = require("os").cpus().length * 2;
+const numberOfWalkers = require("os").cpus().length * 4;
 
 const args = yargs.scriptName("OCFL Indexer").options({
     source: {
