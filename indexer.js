@@ -101,7 +101,6 @@ async function createWalker(paths) {
                     } else {
                         loader.remap();
                         data = loader.objectified;
-                        data = refactorGeoShape({ data });
                         await createIndexAndLoadMapping({ data });
                         await indexDocument({ data });
                     }
@@ -135,6 +134,8 @@ async function createWalker(paths) {
     }
 
     async function indexDocument({ data }) {
+        data = removeContext({ data });
+        data = refactorGeoShape({ data });
         // console.log(JSON.stringify(data, null, 2));
         let index = data.identifier
             .filter(d => d.name === "domain")[0]
@@ -154,6 +155,11 @@ async function createWalker(paths) {
             type: "envelope",
             coordinates
         };
+        return data;
+    }
+
+    function removeContext({ data }) {
+        delete data["@context"];
         return data;
     }
 }
