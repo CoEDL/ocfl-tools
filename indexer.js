@@ -45,7 +45,11 @@ paths = paths.map(p => {
         args,
     };
 });
-paths = chunk(paths, paths.length / numberOfWalkers);
+if (paths.length < numberOfWalkers) {
+    paths = chunk(paths, 1);
+} else {
+    paths = chunk(paths, paths.length / numberOfWalkers);
+}
 
 const pool = new Pool(numberOfWalkers);
 pool.map(paths, createWalker).then(result => {
@@ -125,11 +129,16 @@ async function createWalker(paths) {
         try {
             await elasticClient.indices.get({index});
         } catch (error) {
-            await elasticClient.indices.create({index});
-            await elasticClient.indices.putMapping({
-                index,
-                body: mappings,
-            });
+            try {
+                await elasticClient.indices.create({index});
+                await elasticClient.indices.putMapping({
+                    index,
+                    body: mappings,
+                });
+            } catch (error) {
+                // ignore errors - we're running in parallel so it's
+                //  a known issue
+            }
         }
     }
 
