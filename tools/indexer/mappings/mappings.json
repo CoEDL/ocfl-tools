@@ -1,0 +1,21 @@
+{
+    "mappings": {
+        "properties": {
+            "schema:additionalType": {"type": "keyword"},
+            "@context": {"enabled": false},
+            "type": {"enabled": false},
+            "id": {"enabled": false},
+            "name": {"type": "text"},
+            "description": {"type": "text"},
+            "schema:dateCreated": {"type": "date"},
+            "schema:dateModified": {"type": "date"},
+            "identifier": {
+                "type": "nested",
+                "properties": {
+                    "name": {"type": "keyword"},
+                    "value": {"type": "keyword"}
+                }
+            }
+        }
+    }
+}

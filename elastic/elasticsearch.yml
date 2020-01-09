@@ -1,0 +1,24 @@
+cluster.name: "docker-cluster"
+network.host: 0.0.0.0
+discovery.type: single-node
+xpack.security.http.ssl.enabled: false
+
+###
+### In development we turn security off
+###
+xpack.security.enabled: false
+###
+### If we were running this in prod we would use
+###   the following configuration
+###
+# xpack.security.authc:
+#     anonymous:
+#         username: anonymous
+#         roles: anonymous
+#         authz_exception: true
+# xpack.security.enabled: true
+# xpack.security.transport.ssl.enabled: true
+# xpack.security.http.ssl.key: certs/key.pem
+# xpack.security.http.ssl.certificate: certs/cert.pem
+# xpack.security.transport.ssl.key: certs/key.pem
+# xpack.security.transport.ssl.certificate: certs/cert.pem

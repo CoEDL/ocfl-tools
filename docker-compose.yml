@@ -2,19 +2,47 @@ version: "2"
 
 volumes:
     indexer-modules:
+    search:
 
 services:
-    indexer:
-        image: node:12-stretch
-        hostname: indexer
-        tty: true
+    # tools:
+    #     image: node:12-stretch
+    #     hostname: tools
+    #     tty: true
+    #     environment:
+    #         TERM: "xterm-256color"
+    #         NODE_ENV: "development"
+    #     mem_limit: 512M
+    #     volumes:
+    #         - $PWD:/srv/tools:delegated
+    #         - $PWD/../ocfl-repository:/srv/repository:delegated
+    #         - indexer-modules:/srv/indexer/node_modules:delegated
+    #     working_dir: /srv/tools
+    #     command: ["/bin/bash"]
+
+    search:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+        hostname: search
         environment:
-            TERM: "xterm-256color"
-            NODE_ENV: "development"
-        mem_limit: 512M
+            - node.name=search
+            - discovery.seed_hosts=search
+            - bootstrap.memory_lock=true
+            - http.host=0.0.0.0
+            - "ES_JAVA_OPTS=-Xms4096m -Xmx4096m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+            nofile:
+                soft: 65536
+                hard: 65536
+        cap_add:
+            - IPC_LOCK
         volumes:
-            - $PWD:/srv/indexer:delegated
-            - $PWD/../ocfl-repository:/srv/repository:delegated
-            - indexer-modules:/srv/indexer/node_modules:delegated
-        working_dir: /srv/indexer
-        command: ["/bin/bash"]
+            - search:/usr/share/elasticsearch/data:delegated
+            - $PWD/elastic/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+            - $PWD/elastic/roles.yml:/usr/share/elasticsearch/config/roles.yml
+            - $PWD/elastic/users:/usr/share/elasticsearch/config/users
+            - $PWD/elastic/users_roles:/usr/share/elasticsearch/config/users_roles
+        ports:
+            - 9200:9200

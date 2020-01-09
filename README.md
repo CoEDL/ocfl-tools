@@ -1,60 +1,135 @@
-# OCFL-indexer
+# OCFL-Tools
 
-- [OCFL-indexer](#ocfl-indexer)
-  - [About](#about)
-  - [Data Validation](#data-validation)
-  - [Important](#important)
-  - [Running the indexer in development](#running-the-indexer-in-development)
-  - [Running the tests](#running-the-tests)
+-   [OCFL-Tools](#ocfl-tools)
+    -   [About](#about)
+    -   [Developing the tools](#developing-the-tools)
+    -   [Running the tests](#running-the-tests)
 
 ## About
 
-The indexer is a small node application that walks the OCFL filesystem looking for files named `ro-crate-metadata.jsonld`. When it finds it one it reads the content and unflattens it (reverses the JSON-ld flattening to return an object) before passing it through a schema validator to ensure that the information required for this application to work has been defined.
+This repository contains a set of tools for working with, interacting with and manipulating OCFL objects in a repository.
 
-## Data Validation
+The over-arching tool `ocfl-tools.js` is the parent of a set of subcommands that each have their own code and configuration in the `tools` folder. See the individual README.md files in the tool folders for information about that specific tool.
 
-In order to ensure that the data is going to work with this application it is first validated against a schema that defines how it should look and what is required. To determine which schema to load the data must contain a property `schema:additionalType` set to `collection` or  `item`.
+## Developing the tools
 
-The collection schema file is `collection.schema.json` whilst the item schema file is `item.schema.json`. Consult the schema's to see what is required and how it is required to be defined.
+Developing the tools first requires that you start the required docker containers This is done via `docker-compose up -d`.
 
-## Important
-In both instances, the indentifier must have `PropertyValues` set as follows:
- * `domain`: the domain of the data - e.g. paradisec.org.au. This is used as the index name in which to ingest the data.
- * `id`: the ID of the item as a domain path - e.g. paradisec.org.au/NT11 (collection) or paradisec.org.au/NT11/001 (item)
- * `hashId`: the SHA256 hash of the id.
- * `collectionIdentifier`: the collection ID - e.g. NT11
- * `itemIdentifier`: the item ID - e.g. 001. Applies only to items.
-  
-If an RO-Crate doesn't verify, the errors will be printed and the crate will not be indexed.
+## Adding a new tool
 
-## Running the indexer in development
+-   Create a folder in `./tools` named as the tool
+-   Add an `index.js` that exports an object like:
+    ```
+    module.exports = {
+      command: 'validate-crate',
+      description: 'Validate an RO-Crate',
+      builder: {
+          'path-to-object': {
+              demandOption: true,
+              describe:
+                  'The path to a single OCFL object containing an RO-Crate.',
+              type: 'string',
+          },
+      },
+      handler: async args => {
+          // the code for the tool
+      },
+    }
+    ```
+-   Look at `tools/validate-crate` for a simple example and `tools/indexer` for a more complex, multiprocessing example.
 
-When the development cluster starts the elastic service will be empty. To populate it run the following command:
+See [http://yargs.js.org/docs/](http://yargs.js.org/docs/) for option documentation.
+
+## Getting to the tool help
+
+To see the help for the parent tool run:
 
 ```
->  node indexer.js \
-    --source ../ocfl-repository \
-    --search http://localhost:9200 \
-    --username indexer \
-    --password somerandompassword
+./node_modules/.bin/babel-node ocfl-tools.js --help
 ```
 
-In development, the elastic service is configured with a user `indexer` that has superuser access to the service with a password of `somerandompassword`.
+And to see the help for a specific tool (e.g. the indexer)
+
+```
+./node_modules/.bin/babel-node ocfl-tools.js indexer --help
+```
 
 ## Running the tests
 
-Tests need to run inside the a linux container so you first need to start it.
-
 ```
-> docker-compose up -d
+> npm run tests
 ```
 
-The first time, install the modules, viz:
+OR to get a coverage report
+
 ```
-> ./run-tests.sh --install
+> npm run tess-with-coverage
 ```
 
-After that (assuming you haven't added any tests):
+OR to do it via a GUI
+
 ```
-> ./run-tests.sh
+> npm run majestic
+```
+
+## Minimum requirements of an RO-Crate
+
+At a minimum, in order for an RO-Crate to be useable by this code it must have the following properties:
+
+```
+  -   @id = './'
+  -   name = string
+  -   description = string
+  -   identifier = [
+        { @type = "PropertyValue", name = 'domain', value = domain name of data without / },
+        { @type = "PropertyValue", name = 'id', value = identifier of the thing described by the crate },
+        { @type = "Property Value", name = 'hashId', value = the SHA512 encoded 'id' },
+      ]
+```
+
+Following is an example, flattened crate:
+
+```
+{
+    "@context": "https://w3id.org/ro/crate/1.0/context",
+    "@graph": [
+        {
+            "@id": "./",
+            "@type": ["Dataset", "RepositoryObject"],
+            "name": "My Dataset",
+            "description": "The best data ever collected!",
+            "identifier": [
+                {"@id": "_:b1"},
+                {"@id": "_:b2"},
+                {"@id": "_:b3"},
+            ],
+        },
+        {
+            "@id": "_:b1",
+            "@type": "PropertyValue",
+            "name": "domain",
+            "value": "paradisec.org.au
+        }
+        {
+            "@id": "_:b2",
+            "@type": "PropertyValue",
+            "name": "id",
+            "value": "/paradisec.org.au/AC1/001"
+        },
+        {
+            "@id": "_:b3",
+            "@type": "PropertyValue",
+            "name": "hashId",
+            "value": "7C86FB6C455BD522519E597A6B69B63CB5752E13E5658489C27F64CE9ED7A0E68F90DCE7BDE727BDAB4F3E059D46F78125BDFAE859A7FDA09250644765168C66"
+        },
+        {
+            "@id": "ro-crate-metadata.jsonld",
+            "@type": "CreativeWork",
+            "about": {"@id": "./"},
+            "identifier": "ro-crate-metadata.jsonld",
+            "license": {"@id": "https://creativecommons.org/licenses/by-sa/3.0"}
+        }
+    ]
+}
+
 ```

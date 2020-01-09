@@ -1,0 +1,220 @@
+{
+    "@context": "https://w3id.org/ro/crate/1.0/context",
+    "@graph": [
+        {
+            "@id": "./",
+            "@type": ["Dataset", "RepositoryObject"],
+            "http://paradisec.org.au/adminComment": "",
+            "http://paradisec.org.au/bornDigital": "0",
+            "http://paradisec.org.au/citeAs": "",
+            "http://paradisec.org.au/contentLanguages": [],
+            "http://paradisec.org.au/dialect": "dialect",
+            "http://paradisec.org.au/digitisedOn": "2006-02-02T13:00:00.000Z",
+            "http://paradisec.org.au/discourseType": "discourseType",
+            "http://paradisec.org.au/external": "0",
+            "http://paradisec.org.au/ingestNotes": "A)  3 3/4ips, NAB eq, 1track of 1/2trk.  Field recordings, speech.  Some high-freq whistle, possibly from dub?\r\nLength: Side A: 0:19:07.\r\nB)  BLANK\r\n",
+            "http://paradisec.org.au/languageAsGiven": "Luganda",
+            "http://paradisec.org.au/originatedOn": "1958-12-23",
+            "http://paradisec.org.au/originatedOnNarrative": "",
+            "http://paradisec.org.au/private": "0",
+            "http://paradisec.org.au/receivedOn": "",
+            "http://paradisec.org.au/subjectLanguages": [],
+            "additionalType": "collection",
+            "author": {"@id": "_:b0"},
+            "contentLocation": {"@id": "_:b1"},
+            "path": "./",
+            "contributor": [{"@id": "_:b3"}, {"@id": "_:b5"}],
+            "dateCreated": "2005-02-27T13:00:00.000Z",
+            "dateModified": "2018-04-05T05:30:59.000Z",
+            "description": "Luganda (Fr Kibéngere)\r\n\r\nside B: blank",
+            "hasPart": [
+                {"@id": "AC1-001-A.mp3"},
+                {"@id": "AC1-001-A.wav"},
+                {"@id": "AC1-001-IMG_02.tif"},
+                {"@id": "AC1-001-IMG_02.jpg"},
+                {"@id": "AC1-001-IMG_01.tif"},
+                {"@id": "AC1-001-IMG_01.jpg"},
+                {"@id": "AC1-001-IMG_03.tif"},
+                {"@id": "AC1-001-IMG_03.jpg"}
+            ],
+            "identifier": [
+                {"@id": "_:b8"},
+                {"@id": "_:b9"},
+                {"@id": "_:b10"},
+                {"@id": "_:b11"},
+                {"@id": "_:b12"}
+            ],
+            "license": {"@id": "_:b13"},
+            "memberOf": {"@id": "/paradisec.org.au/AC1"},
+            "name": "Luganda (Fr Kibéngere)",
+            "publisher": {"@id": "_:b14"}
+        },
+        {
+            "@id": "AC1-001-A.mp3",
+            "@type": "File",
+            "bitrate": "127727",
+            "contentSize": "18327680",
+            "dateCreated": "2005-02-27T13:00:00.000Z",
+            "dateModified": "2017-09-08T02:00:55.000Z",
+            "duration": "1147.93",
+            "encodingFormat": "audio/mpeg",
+            "name": "AC1-001-A.mp3"
+        },
+        {
+            "@id": "AC1-001-A.wav",
+            "@type": "File",
+            "bitrate": "4609811",
+            "contentSize": "661449946",
+            "dateCreated": "2005-02-27T13:00:00.000Z",
+            "dateModified": "2017-09-08T02:01:13.000Z",
+            "duration": "1147.9",
+            "encodingFormat": "audio/x-wav",
+            "name": "AC1-001-A.wav"
+        },
+        {
+            "@id": "AC1-001-IMG_01.jpg",
+            "@type": "File",
+            "bitrate": "",
+            "contentSize": "1157474",
+            "dateCreated": "2016-10-11T22:06:34.000Z",
+            "dateModified": "2016-10-12T15:00:26.000Z",
+            "duration": "",
+            "encodingFormat": "image/jpeg",
+            "name": "AC1-001-IMG_01.jpg"
+        },
+        {
+            "@id": "AC1-001-IMG_01.tif",
+            "@type": "File",
+            "bitrate": "",
+            "contentSize": "29972116",
+            "dateCreated": "2016-10-11T22:06:33.000Z",
+            "dateModified": "2016-10-12T15:00:22.000Z",
+            "duration": "",
+            "encodingFormat": "image/tiff",
+            "name": "AC1-001-IMG_01.tif"
+        },
+        {
+            "@id": "AC1-001-IMG_02.jpg",
+            "@type": "File",
+            "bitrate": "",
+            "contentSize": "1192048",
+            "dateCreated": "2016-10-11T22:03:26.000Z",
+            "dateModified": "2016-10-12T15:00:17.000Z",
+            "duration": "",
+            "encodingFormat": "image/jpeg",
+            "name": "AC1-001-IMG_02.jpg"
+        },
+        {
+            "@id": "AC1-001-IMG_02.tif",
+            "@type": "File",
+            "bitrate": "",
+            "contentSize": "29971726",
+            "dateCreated": "2016-10-11T22:03:25.000Z",
+            "dateModified": "2016-10-12T15:00:13.000Z",
+            "duration": "",
+            "encodingFormat": "image/tiff",
+            "name": "AC1-001-IMG_02.tif"
+        },
+        {
+            "@id": "AC1-001-IMG_03.jpg",
+            "@type": "File",
+            "bitrate": "",
+            "contentSize": "1206492",
+            "dateCreated": "2016-10-11T22:07:13.000Z",
+            "dateModified": "2016-10-12T15:00:34.000Z",
+            "duration": "",
+            "encodingFormat": "image/jpeg",
+            "name": "AC1-001-IMG_03.jpg"
+        },
+        {
+            "@id": "AC1-001-IMG_03.tif",
+            "@type": "File",
+            "bitrate": "",
+            "contentSize": "29973228",
+            "dateCreated": "2016-10-11T22:07:12.000Z",
+            "dateModified": "2016-10-12T15:00:30.000Z",
+            "duration": "",
+            "encodingFormat": "image/tiff",
+            "name": "AC1-001-IMG_03.tif"
+        },
+        {
+            "@id": "_:b0",
+            "@type": "Person",
+            "givenName": "Arthur",
+            "name": "Arthur Capell"
+        },
+        {"@id": "_:b1", "@type": "Place", "geo": {"@id": "_:b2"}, "name": ""},
+        {
+            "@id": "_:b10",
+            "@type": "PropertyValue",
+            "name": "itemIdentifier",
+            "value": "001"
+        },
+        {
+            "@id": "_:b11",
+            "@type": "PropertyValue",
+            "name": "collectionIdentifier",
+            "value": "AC1"
+        },
+        {
+            "@id": "_:b12",
+            "@type": "PropertyValue",
+            "name": "doi",
+            "value": "10.4225/72/56E97C3321C5D"
+        },
+        {"@id": "_:b13", "name": ""},
+        {
+            "@id": "_:b14",
+            "identifier": "http://nla.gov.au/nla.party-593941",
+            "name": "University of Sydney"
+        },
+        {
+            "@id": "_:b2",
+            "@type": "GeoShape",
+            "box": "31.03,-0.995 33.396,1.612"
+        },
+        {
+            "@id": "_:b3",
+            "@type": "Role",
+            "contributor": {"@id": "_:b4"},
+            "name": "operator"
+        },
+        {
+            "@id": "_:b4",
+            "@type": "Person",
+            "givenName": "Frank",
+            "name": "Frank Davey"
+        },
+        {
+            "@id": "_:b5",
+            "@type": "Role",
+            "contributor": {"@id": "_:b6"},
+            "name": "recorder"
+        },
+        {
+            "@id": "_:b6",
+            "@type": "Person",
+            "givenName": "Arthur",
+            "name": "Arthur Capell"
+        },
+        {
+            "@id": "_:b8",
+            "@type": "PropertyValue",
+            "name": "id",
+            "value": "/paradisec.org.au/AC1/001"
+        },
+        {
+            "@id": "_:b9",
+            "@type": "PropertyValue",
+            "name": "hashId",
+            "value": "bf9919556e5ac297f01dc6beacc843f9748dcceceb5aa4eba004d6bb349cced2"
+        },
+        {
+            "@id": "ro-crate-metadata.jsonld",
+            "@type": "CreativeWork",
+            "about": {"@id": "./"},
+            "identifier": "ro-crate-metadata.jsonld",
+            "license": {"@id": "https://creativecommons.org/licenses/by-sa/3.0"}
+        }
+    ]
+}

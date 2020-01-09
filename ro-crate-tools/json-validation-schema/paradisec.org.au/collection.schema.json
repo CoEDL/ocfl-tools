@@ -1,0 +1,163 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://ocfl-indexer/json-validation-schema/paradisec.org.au/collection.schema.json",
+    "title": "Item",
+    "description": "A paradisec collection ingested in to OCFL",
+    "type": "object",
+    "properties": {
+        "contributor": {
+            "type": ["array", "object"],
+            "items": {
+                "type": "object",
+                "properties": {
+                    "@type": {
+                        "type": "array",
+                        "maxItems": 1,
+                        "items": {
+                            "type": "string",
+                            "const": "Role"
+                        }
+                    },
+                    "name": {
+                        "type": "array",
+                        "maxItems": 1,
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "contributor": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "familyName": {
+                                    "type": "array",
+                                    "maxItems": 1,
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "givenName": {
+                                    "type": "array",
+                                    "maxItems": 1,
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "name": {
+                                    "type": "array",
+                                    "maxItems": 1,
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "required": ["@type", "name", "contributor"]
+            }
+        },
+        "contentLocation": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "@type": {
+                        "type": "array",
+                        "maxItems": 1,
+                        "items": {
+                            "type": "string",
+                            "const": "Place"
+                        }
+                    },
+                    "geo": {
+                        "type": "array",
+                        "maxItems": 1,
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "@type": {
+                                    "type": "array",
+                                    "maxItems": 1,
+                                    "items": {
+                                        "type": "string",
+                                        "const": "GeoShape"
+                                    }
+                                },
+                                "box": {
+                                    "type": "array",
+                                    "maxItems": 1,
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "identifier": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "@type": {
+                        "type": "array",
+                        "maxItems": 1,
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "name": {
+                        "type": "array",
+                        "maxItems": 1,
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "value": {
+                        "type": "array",
+                        "maxItems": 1,
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": ["@type", "name"]
+            },
+            "contains": {
+                "type": "object",
+                "properties": {
+                    "@type": {
+                        "type": "array",
+                        "maxItems": 1,
+                        "items": {
+                            "const": "PropertyValue"
+                        }
+                    },
+                    "name": {
+                        "type": "array",
+                        "maxItems": 1,
+                        "items": {
+                            "enum": ["collectionIdentifier"]
+                        }
+                    }
+                }
+            }
+        },
+        "hasMember": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    },
+    "required": ["identifier", "hasMember"]
+}

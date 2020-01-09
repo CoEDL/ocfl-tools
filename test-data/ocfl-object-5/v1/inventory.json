@@ -1,0 +1,27 @@
+{
+  "id": "e7e3c12a5ab4f8f29d0040410e67326b438ac6367abc11cb358cab36fd896b2c",
+  "type": "https://ocfl.io/1.0/spec/#inventory",
+  "digestAlgorithm": "sha512",
+  "head": "v1",
+  "versions": {
+    "v1": {
+      "created": "2019-11-15T02:53:09.349Z",
+      "state": {
+        "2c1219cd9f9cad23ad6c6c4c0385f6834a9d072719db8899ea5f70445c41382729c6d6ab5c20daca2e55048f000ff43e1ccbee7610150c726023239f9b174a1d": [
+          "ro-crate-metadata.jsonld"
+        ],
+        "e26b727a23db14d740b709bfd4e254de18a5398270283c6d9cbdb970ff4f21043521462fc5f69bafe3707d8380749ed1229e342903cf78936e99c043b3fb0072": [
+          "ro-crate-preview.html"
+        ]
+      }
+    }
+  },
+  "manifest": {
+    "2c1219cd9f9cad23ad6c6c4c0385f6834a9d072719db8899ea5f70445c41382729c6d6ab5c20daca2e55048f000ff43e1ccbee7610150c726023239f9b174a1d": [
+      "v1/content/ro-crate-metadata.jsonld"
+    ],
+    "e26b727a23db14d740b709bfd4e254de18a5398270283c6d9cbdb970ff4f21043521462fc5f69bafe3707d8380749ed1229e342903cf78936e99c043b3fb0072": [
+      "v1/content/ro-crate-preview.html"
+    ]
+  }
+}

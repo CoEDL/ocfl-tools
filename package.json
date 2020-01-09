@@ -4,9 +4,11 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "develop": "npm install --no-progress && node_modules/.bin/webpack-dev-server --config webpack.develop.js --hot --inline",
+        "tools": "./node_modules/.bin/babel-node ./ocfl-tools.js",
         "build:production": "npm install --no-progress && node_modules/.bin/webpack --config webpack.production.js",
-        "test": "jest --coverage"
+        "tests": "jest",
+        "tests-with-coverage": "jest --coverage",
+        "majestic": "./node_modules/.bin/majestic"
     },
     "repository": {
         "type": "git",
@@ -15,13 +17,18 @@
     "author": "Marco La Rosa",
     "license": "ISC",
     "dependencies": {
+        "@babel/node": "^7.7.0",
         "@elastic/elasticsearch": "^7.3.0",
         "ajv": "^6.10.2",
+        "fs-extra": "^8.1.0",
         "jsonld": "^1.8.0",
         "lodash": "^4.17.15",
         "multiprocessing": "^1.2.0",
+        "ocfl": "github:marcolarosa/ocfl-js#feature-pdsc",
         "request": "^2.88.0",
         "request-promise-native": "^1.0.7",
+        "ro-crate": "github:UTS-eResearch/ro-crate-js#feature/objectify",
+        "ulog": "^1.1.0",
         "walk": "^2.3.14",
         "yargs": "^14.0.0"
     },
@@ -31,6 +38,7 @@
         "@babel/plugin-syntax-dynamic-import": "^7.2.0",
         "@babel/preset-env": "^7.6.2",
         "babel-jest": "^24.9.0",
-        "jest": "^24.9.0"
+        "jest": "^24.9.0",
+        "majestic": "^1.6.1"
     }
 }
