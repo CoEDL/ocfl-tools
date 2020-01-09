@@ -43,10 +43,21 @@ module.exports = {
                 ) {
                     valid = false;
                     console.log(
-                        `Domain property contains an invalid character "${c}": ${domain}`
+                        ` * "domain" property contains an invalid character "${c}": ${domain}`
                     );
                 }
             });
+
+            // validate hashId is SHA512 hash
+            const hashId = objectifiedCrate.identifier.filter(
+                i => i.name[0] === 'hashId'
+            )[0].value[0];
+            if (hashId.length !== 128) {
+                valid = false;
+                console.log(
+                    ` * "hashId" property does not seem correct. Is it a SHA512 hash?`
+                );
+            }
 
             if (valid) {
                 console.log('Crate is valid');
