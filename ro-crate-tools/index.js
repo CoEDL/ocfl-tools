@@ -101,7 +101,8 @@ class CRATE_TOOLS {
         schema = await readJson(schema);
         let valid = await ajv.validate(schema, data);
         if (!valid) console.log(ajv.errors);
-        if (valid && verbose) log.info(`Crate validates successfully.\n`);
+        if (valid && verbose)
+            log.info(`Crate structure validates successfully.\n`);
         // console.log(JSON.stringify(data, null, 2));
         // are there domain specific validators
         if (domain !== 'default') {
@@ -129,7 +130,7 @@ class CRATE_TOOLS {
                     let valid = await ajv.validate(schema, data);
                     if (!valid) console.log(ajv.errors);
                     if (valid && verbose)
-                        log.info(`Crate validates successfully.\n`);
+                        log.info(`Crate structure validates successfully.\n`);
                 }
 
                 // perform domain specific, type specific validation
@@ -149,7 +150,7 @@ class CRATE_TOOLS {
                     let valid = await ajv.validate(schema, data);
                     if (!valid) console.log(ajv.errors);
                     if (valid && verbose)
-                        log.info(`Crate validates successfully.\n`);
+                        log.info(`Crate structure validates successfully.\n`);
                 }
             }
         }
@@ -164,90 +165,6 @@ class CRATE_TOOLS {
             compactToRelative: true,
             skipExpansion: true,
         });
-    }
-
-    // async objectify() {
-    //     let data = await jsonld.expand(this.data);
-    //     // console.log(JSON.stringify(data, null, 2));
-
-    //     let root = data.filter(i => {
-    //         if (i['@type'])
-    //             return i['@type'].includes('http://schema.org/Dataset');
-    //     })[0];
-    //     let content = data.filter(i => {
-    //         if (i['@type'])
-    //             return !i['@type'].includes('http://schema.org/Dataset');
-    //         return i;
-    //     });
-    //     // console.log(JSON.stringify(content, null, 2));
-
-    //     let rootProperties = Object.keys(root);
-    //     for (let property of rootProperties) {
-    //         let item = root[property];
-    //         if (isArray(item)) {
-    //             item = mapContent({property, item, content});
-    //             root[property] = [...item];
-    //         }
-    //     }
-    //     // console.log(JSON.stringify(root, null, 2));
-
-    //     this.objectified = await compact(root);
-    //     // console.log(JSON.stringify(this.objectified, null, 2));
-
-    //     async function compact(root) {
-    //         return await jsonld.compact(root, context, {
-    //             base: null,
-    //             // compactArrays: false,
-    //             compactToRelative: true,
-    //             skipExpansion: true,
-    //         });
-    //     }
-
-    //     function mapContent({property, item, content}) {
-    //         item = item.map(entry => {
-    //             if (entry['@id']) {
-    //                 let entryData = content.filter(
-    //                     c => c['@id'] === entry['@id']
-    //                 )[0];
-
-    //                 if (entryData) {
-    //                     let properties = Object.keys(entryData);
-    //                     for (let prop of properties) {
-    //                         if (isArray(entryData[prop]))
-    //                             entryData[prop] = mapContent({
-    //                                 property: prop,
-    //                                 item: entryData[prop],
-    //                                 content,
-    //                             });
-    //                     }
-    //                     entry = {...entry, ...entryData};
-    //                     if (!maintainIds.includes(property))
-    //                         delete entry['@id'];
-    //                 }
-    //             }
-    //             return entry;
-    //         });
-    //         return item;
-    //     }
-    // }
-
-    remap() {
-        this.objectified.contributor = flattenContributor({
-            contributor: this.objectified.contributor,
-        });
-
-        function flattenContributor({contributor}) {
-            if (isPlainObject(contributor)) {
-                contributor = [contributor];
-            }
-            contributor = contributor.map(c => {
-                return {
-                    name: c.contributor.name,
-                    role: c.name,
-                };
-            });
-            return contributor;
-        }
     }
 }
 
