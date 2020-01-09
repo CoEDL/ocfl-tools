@@ -11,9 +11,13 @@ This repository contains a set of tools for working with, interacting with and m
 
 The over-arching tool `ocfl-tools.js` is the parent of a set of subcommands that each have their own code and configuration in the `tools` folder. See the individual README.md files in the tool folders for information about that specific tool.
 
+## Setup
+
+Ensure you run `npm install` before doing anything else.
+
 ## Developing the tools
 
-Developing the tools first requires that you start the required docker containers This is done via `docker-compose up -d`.
+Developing the tools first requires that you start the required docker containers. This is done via `docker-compose up -d`.
 
 ## Adding a new tool
 
@@ -53,6 +57,10 @@ And to see the help for a specific tool (e.g. the indexer)
 ```
 ./node_modules/.bin/babel-node ocfl-tools.js indexer --help
 ```
+
+### Tool Readme
+
+Each tool should have it's own README.md that describes how to use it and any other information pertinent to that tool.
 
 ## Running the tests
 
