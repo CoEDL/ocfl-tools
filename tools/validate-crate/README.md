@@ -7,11 +7,10 @@ This tool will validate an `RO-Crate` inside an OCFL object against the JSON val
 ## Running it
 
 ```
-./node_modules/.bin/babel-node ocfl-tools.js indexer \
-    --search http://localhost:9200 \
-    --username validate-crate \
+./node_modules/.bin/babel-node ocfl-tools.js validate-crate \
     --source /path/to/ocfl-repository \
-    --path-to-object /path/to/object/relative/to/ocfl/root
+    --path-to-object /path/to/object/relative/{source} \
+    --log-level debug
 ```
 
 Things to note:
