@@ -22,6 +22,35 @@ module.exports = {
             flattenedCrate,
             objectifiedCrate,
         } = await crateTools.loadLatestCrate();
-        const {valid, domain} = await crateTools.validate({verbose: true});
+        const verbose = args.logLevel === 'debug' ? true : false;
+        let {valid, domain} = await crateTools.validate({verbose});
+        if (valid) {
+            // validate domain in appropriate form.
+            [...domain].forEach(c => {
+                if (
+                    [
+                        ' ',
+                        '"',
+                        '*',
+                        '\\',
+                        '<',
+                        '|',
+                        ',',
+                        '>',
+                        '/',
+                        '?',
+                    ].includes(c)
+                ) {
+                    valid = false;
+                    console.log(
+                        `Domain property contains an invalid character "${c}": ${domain}`
+                    );
+                }
+            });
+
+            if (valid) {
+                console.log('Crate is valid');
+            }
+        }
     },
 };
