@@ -4,6 +4,7 @@
     -   [Folder layout](#folder-layout)
     -   [Adding a new validator](#adding-a-new-validator)
         -   [Are you adding a generic domain validator to be run over all crates from a specific domain?](#are-you-adding-a-generic-domain-validator-to-be-run-over-all-crates-from-a-specific-domain)
+        -   [Are you adding a type specific validator for a domain?](#are-you-adding-a-type-specific-validator-for-a-domain)
 
 ## Folder layout
 
