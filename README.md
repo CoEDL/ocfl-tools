@@ -2,8 +2,13 @@
 
 -   [OCFL-Tools](#ocfl-tools)
     -   [About](#about)
+    -   [Setup](#setup)
     -   [Developing the tools](#developing-the-tools)
+    -   [Adding a new tool](#adding-a-new-tool)
+    -   [Getting to the tool help](#getting-to-the-tool-help)
+        -   [Tool Readme](#tool-readme)
     -   [Running the tests](#running-the-tests)
+    -   [Minimum requirements of an RO-Crate](#minimum-requirements-of-an-ro-crate)
 
 ## About
 
