@@ -91,6 +91,8 @@ class CRATE_TOOLS {
             ? data.additionalType[0]
             : null;
 
+        if (verbose) console.log(JSON.stringify(data, null, 2));
+
         // perform generic verification
         // console.log(JSON.stringify(data, null, 2));
         if (verbose)
