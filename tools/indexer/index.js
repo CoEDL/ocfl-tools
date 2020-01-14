@@ -121,11 +121,14 @@ async function createWalker(paths) {
                             objectPath: objectPath,
                         });
                         try {
+                            // load the latest crate
                             let {
                                 flattenedCrate,
                                 objectifiedCrate,
                             } = await crateTools.loadLatestCrate();
                             // console.log(JSON.stringify(objectifiedCrate, null, 2));
+
+                            // validate it
                             const {valid, domain} = await crateTools.validate(
                                 {}
                             );
@@ -135,12 +138,28 @@ async function createWalker(paths) {
                                 );
                                 return;
                             }
+
                             objectifiedCrate = await crateTools.compact();
+                            // console.log(
+                            //     JSON.stringify(objectifiedCrate, null, 2)
+                            // );
+
+                            // run it through any domain transformers
+                            let transformerPath = `${basePath}/tools/indexer/transformers/${domain}/index.js`;
+                            if (await pathExists(transformerPath)) {
+                                const {transformer} = require(transformerPath);
+                                objectifiedCrate = transformer({
+                                    data: objectifiedCrate,
+                                });
+                            }
                             log.debug(`Setting up index for: `, domain);
+
+                            // create the index if required and load the domain specific mapping if there is one
                             await createIndexAndLoadMapping({
                                 index: domain,
                             });
 
+                            // and finally - index the document
                             log.debug(`Indexing document at path: `, root);
                             await indexDocument({
                                 index: domain,
@@ -205,7 +224,7 @@ async function createWalker(paths) {
 
     async function indexDocument({data, index}) {
         data = removeContext({data});
-        data = refactorGeoShape({data});
+        // data = refactorGeoShape({data});
         // console.log(JSON.stringify(data, null, 2));
         let id = data.identifier.filter(d => d.name === 'hashId')[0].value;
         // console.info(`Indexing as ${index}/${id}`);
@@ -214,20 +233,6 @@ async function createWalker(paths) {
         } catch (error) {
             throw new Error(error.meta.body.error.reason);
         }
-    }
-
-    function refactorGeoShape({data}) {
-        if (!data.contentLocation) return data;
-        let shape = data.contentLocation.geo.box;
-        let coordinates = [
-            shape.split(' ')[0].split(','),
-            shape.split(' ')[1].split(','),
-        ];
-        data.contentLocation = {
-            type: 'envelope',
-            coordinates,
-        };
-        return data;
     }
 
     function removeContext({data}) {
