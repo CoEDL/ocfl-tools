@@ -6,6 +6,7 @@ module.exports = {
 
 function transformer({data}) {
     data = refactorGeoShape({data});
+    data = remapContributors({data});
     return data;
 }
 
@@ -20,5 +21,15 @@ function refactorGeoShape({data}) {
         type: 'envelope',
         coordinates,
     };
+    return data;
+}
+
+function remapContributors({data}) {
+    data.contributor = data.contributor.map(c => {
+        return {
+            role: c.name,
+            name: c.contributor.name,
+        };
+    });
     return data;
 }
