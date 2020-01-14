@@ -1,13 +1,13 @@
 {
     "mappings": {
         "properties": {
-            "schema:additionalType": {"type": "keyword"},
+            "additionalType": {"type": "keyword"},
             "@context": {"enabled": false},
             "id": {"enabled": false},
             "name": {"type": "text"},
             "description": {"type": "text"},
-            "schema:dateCreated": {"type": "date"},
-            "schema:dateModified": {"type": "date"},
+            "dateCreated": {"type": "date"},
+            "dateModified": {"type": "date"},
             "contributor": {
                 "type": "nested",
                 "properties": {
