@@ -29,8 +29,8 @@
                     "contentSize": {"type": "long"},
                     "bitrate": {"type": "integer"},
                     "encodingFormat": {"type": "keyword"},
-                    "schema:dateCreated": {"type": "date"},
-                    "schema:dateModified": {"type": "date"}
+                    "dateCreated": {"type": "date"},
+                    "dateModified": {"type": "date"}
                 }
             },
             "publisher": {
@@ -43,6 +43,13 @@
                 "type": "nested",
                 "properties": {
                     "geo": {"type": "geo_shape"}
+                }
+            },
+            "hasContent": {"type": "keyword"},
+            "license": {
+                "type": "nested",
+                "properties": {
+                    "name": {"type": "keyword"}
                 }
             }
         }

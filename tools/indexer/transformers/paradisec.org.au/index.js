@@ -7,6 +7,7 @@ module.exports = {
 function transformer({data}) {
     data = refactorGeoShape({data});
     data = remapContributors({data});
+    data = hasContent({data});
     return data;
 }
 
@@ -31,5 +32,10 @@ function remapContributors({data}) {
             name: c.contributor.name,
         };
     });
+    return data;
+}
+
+function hasContent({data}) {
+    data.hasContent = data.hasPart && data.hasPart.length ? true : false;
     return data;
 }
