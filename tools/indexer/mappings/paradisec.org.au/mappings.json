@@ -1,9 +1,9 @@
 {
     "mappings": {
         "properties": {
-            "additionalType": {"type": "keyword"},
             "@context": {"enabled": false},
             "id": {"enabled": false},
+            "additionalType": {"type": "keyword"},
             "name": {"type": "text"},
             "description": {"type": "text"},
             "dateCreated": {"type": "date"},
@@ -45,11 +45,25 @@
                     "geo": {"type": "geo_shape"}
                 }
             },
-            "hasContent": {"type": "keyword"},
+            "hasContent": {"type": "boolean"},
             "license": {
                 "type": "nested",
                 "properties": {
                     "name": {"type": "keyword"}
+                }
+            },
+            "contentLanguages": {
+                "type": "nested",
+                "properties": {
+                    "name": {"type": "keyword"},
+                    "alternateName": {"type": "keyword"}
+                }
+            },
+            "subjectLanguages": {
+                "type": "nested",
+                "properties": {
+                    "name": {"type": "keyword"},
+                    "alternateName": {"type": "keyword"}
                 }
             }
         }
