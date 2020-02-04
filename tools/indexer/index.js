@@ -1,10 +1,12 @@
 'use strict';
 
+const fs = require('fs-extra');
 const {chunk} = require('lodash');
 const {readdir: readDirectory, statSync} = require('fs-extra');
 const path = require('path');
 const Pool = require('multiprocessing').Pool;
 const log = require('ulog')('indexer');
+const {Client} = require('@elastic/elasticsearch');
 
 module.exports = {
     command: 'indexer',
@@ -47,6 +49,12 @@ module.exports = {
 
 async function indexer(args) {
     log.level = log[args.logLevel.toUpperCase()];
+    // see if there are any mappings defined and ensure those indices
+    //  exist. Then load the mapping
+    if (args.logLevel === 'debug')
+        console.log('Creating indices and loadding mappings');
+    await createIndicesAndLoadMappings({args});
+
     if (args.pathToObject) {
         let paths = [
             {
@@ -79,6 +87,57 @@ async function indexer(args) {
             log.info('done');
             process.exit();
         });
+    }
+}
+
+async function createIndicesAndLoadMappings({args}) {
+    let contents = await fs.readdir(path.join(__dirname, 'mappings'));
+    let domains = ['default'];
+    for (let item of contents) {
+        let stat = await fs.stat(path.join(__dirname, 'mappings', item));
+        if (stat.isDirectory()) {
+            domains.push(item);
+        }
+    }
+
+    const elasticClient = new Client({
+        node: args.search,
+        auth: {
+            username: args.username,
+            password: args.password,
+        },
+    });
+    let mappings;
+    for (let index of domains) {
+        let mappingFile = path.join(
+            __dirname,
+            'mappings',
+            index,
+            'mappings.json'
+        );
+        if (await fs.pathExists(mappingFile)) {
+            mappings = await fs.readJson(mappingFile);
+        } else {
+            mappingFile = path.join(__dirname, 'mappings/mappings.json');
+            mappings = await fs.readJson(mappingFile);
+        }
+        try {
+            await elasticClient.indices.get({index});
+        } catch (error) {
+            try {
+                await elasticClient.indices.create({index});
+            } catch (error) {
+                throw new Error(error);
+            }
+            try {
+                await elasticClient.indices.putMapping({
+                    index,
+                    body: mappings.mappings,
+                });
+            } catch (error) {
+                throw new Error(error.meta.body.error.reason);
+            }
+        }
     }
 }
 
