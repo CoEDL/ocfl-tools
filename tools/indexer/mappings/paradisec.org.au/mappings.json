@@ -11,7 +11,14 @@
             "contributor": {
                 "type": "nested",
                 "properties": {
-                    "name": {"type": "keyword"},
+                    "name": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
                     "role": {"type": "keyword"}
                 }
             },
@@ -55,14 +62,28 @@
             "contentLanguages": {
                 "type": "nested",
                 "properties": {
-                    "name": {"type": "keyword"},
+                    "name": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
                     "alternateName": {"type": "keyword"}
                 }
             },
             "subjectLanguages": {
                 "type": "nested",
                 "properties": {
-                    "name": {"type": "keyword"},
+                    "name": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
                     "alternateName": {"type": "keyword"}
                 }
             }
