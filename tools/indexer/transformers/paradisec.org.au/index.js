@@ -1,5 +1,7 @@
 'use strict';
 
+const {isPlainObject} = require('lodash');
+
 module.exports = {
     transformer,
 };
@@ -26,6 +28,7 @@ function refactorGeoShape({data}) {
 }
 
 function remapContributors({data}) {
+    if (isPlainObject(data.contributor)) data.contributor = [data.contributor];
     data.contributor = data.contributor.map(c => {
         return {
             role: c.name,
