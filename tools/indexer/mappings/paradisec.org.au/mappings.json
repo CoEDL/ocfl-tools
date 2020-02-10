@@ -19,7 +19,14 @@
                             }
                         }
                     },
-                    "role": {"type": "keyword"}
+                    "role": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    }
                 }
             },
             "identifier": {
@@ -43,7 +50,14 @@
             "publisher": {
                 "type": "nested",
                 "properties": {
-                    "name": {"type": "keyword"}
+                    "name": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    }
                 }
             },
             "contentLocation": {
@@ -56,7 +70,14 @@
             "license": {
                 "type": "nested",
                 "properties": {
-                    "name": {"type": "keyword"}
+                    "name": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    }
                 }
             },
             "contentLanguages": {
@@ -70,7 +91,14 @@
                             }
                         }
                     },
-                    "alternateName": {"type": "keyword"}
+                    "alternateName": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    }
                 }
             },
             "subjectLanguages": {
@@ -84,7 +112,14 @@
                             }
                         }
                     },
-                    "alternateName": {"type": "keyword"}
+                    "alternateName": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    }
                 }
             }
         }
