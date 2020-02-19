@@ -95,7 +95,12 @@ At a minimum, in order for an RO-Crate to be useable by this code it must have t
   -   description = string
   -   identifier = [
         { @type = "PropertyValue", name = 'domain', value = domain name of data without / },
-        { @type = "PropertyValue", name = 'id', value = identifier of the thing described by the crate },
+        {
+            @type = "PropertyValue", name = 'id', value = identifier of the thing described by the crate
+                IMPORTANT: the id must also include the domain and it must be a valid URL path
+                    e.g. /{domain}/{id}
+
+        },
         { @type = "Property Value", name = 'hashId', value = the SHA512 encoded 'id' },
       ]
 ```
