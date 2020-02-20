@@ -181,10 +181,15 @@ async function createWalker(paths) {
                         });
                         try {
                             // load the latest crate
-                            let {
-                                flattenedCrate,
-                                objectifiedCrate,
-                            } = await crateTools.loadLatestCrate();
+                            try {
+                                let {
+                                    flattenedCrate,
+                                    objectifiedCrate,
+                                } = await crateTools.loadLatestCrate();
+                            } catch (error) {
+                                log.error(error.message);
+                                continue;
+                            }
                             // console.log(JSON.stringify(objectifiedCrate, null, 2));
 
                             // validate it

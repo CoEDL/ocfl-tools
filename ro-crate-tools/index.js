@@ -49,6 +49,10 @@ class CRATE_TOOLS {
             state = (await this.ocflObject.getVersion({version: ocflVersion}))
                 .state;
         }
+        if (!state['ro-crate-metadata.jsonld'])
+            throw new Error(
+                `The OCFL object does not have a crate file called 'ro-crate-metadata.jsonld'`
+            );
         if (crateVersion === 'latest') {
             crate = state['ro-crate-metadata.jsonld'].pop();
         } else {
