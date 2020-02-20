@@ -18,11 +18,12 @@ module.exports = {
             ocflRoot: args.source,
             objectPath: args.pathToObject,
         });
+        let flattenedCrate, objectifiedCrate;
         try {
-            let {
+            ({
                 flattenedCrate,
                 objectifiedCrate,
-            } = await crateTools.loadLatestCrate();
+            } = await crateTools.loadLatestCrate());
         } catch (error) {
             console.error(error.message);
             process.exit();
@@ -54,9 +55,11 @@ module.exports = {
             });
 
             // validate hashId is SHA512 hash
-            const hashId = objectifiedCrate.identifier.filter(
-                i => i.name[0] === 'hashId'
-            )[0].value[0];
+            const hashId = objectifiedCrate.identifier.filter(i => {
+                try {
+                    return i.name[0] === 'hashId';
+                } catch (error) {}
+            });
             if (hashId.length !== 128) {
                 valid = false;
                 console.error(
