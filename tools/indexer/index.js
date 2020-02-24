@@ -1,12 +1,10 @@
 'use strict';
 
-const fs = require('fs-extra');
 const {chunk} = require('lodash');
 const {readdir: readDirectory, statSync} = require('fs-extra');
 const path = require('path');
-const Pool = require('multiprocessing').Pool;
 const log = require('ulog')('indexer');
-const {Client} = require('@elastic/elasticsearch');
+const {createWalker, createIndicesAndLoadMappings} = require('./src/lib');
 
 module.exports = {
     command: 'indexer',
@@ -49,10 +47,7 @@ module.exports = {
 
 async function indexer(args) {
     log.level = log[args.logLevel.toUpperCase()];
-    // see if there are any mappings defined and ensure those indices
-    //  exist. Then load the mapping
-    if (args.logLevel === 'debug')
-        console.log('Creating indices and loadding mappings');
+    log.debug('Creating indices and loadding mappings');
     await createIndicesAndLoadMappings({args});
 
     if (args.pathToObject) {
@@ -62,7 +57,7 @@ async function indexer(args) {
                 args,
             },
         ];
-        await createWalker(paths);
+        await createWalker({paths, idx});
     } else {
         let paths = await readDirectory(args.source);
         log.info(`Indexing OCFL content in: ${args.source}`);
@@ -82,220 +77,12 @@ async function indexer(args) {
             paths = chunk(paths, paths.length / args.walkers);
         }
 
-        const pool = new Pool(args.numberOfWalkers);
-        pool.map(paths, createWalker).then(result => {
-            log.info('done');
+        let runners = paths.map((p, idx) => createWalker({paths: p, idx}));
+        try {
+            await Promise.all(runners);
+        } catch (error) {
+            console.log(error);
             process.exit();
-        });
-    }
-}
-
-async function createIndicesAndLoadMappings({args}) {
-    let contents = await fs.readdir(path.join(__dirname, 'mappings'));
-    let domains = ['default'];
-    for (let item of contents) {
-        let stat = await fs.stat(path.join(__dirname, 'mappings', item));
-        if (stat.isDirectory()) {
-            domains.push(item);
         }
-    }
-
-    const elasticClient = new Client({
-        node: args.search,
-        auth: {
-            username: args.username,
-            password: args.password,
-        },
-    });
-    let mappings;
-    for (let index of domains) {
-        let mappingFile = path.join(
-            __dirname,
-            'mappings',
-            index,
-            'mappings.json'
-        );
-        if (await fs.pathExists(mappingFile)) {
-            mappings = await fs.readJson(mappingFile);
-        } else {
-            mappingFile = path.join(__dirname, 'mappings/mappings.json');
-            mappings = await fs.readJson(mappingFile);
-        }
-        try {
-            await elasticClient.indices.get({index});
-        } catch (error) {
-            try {
-                await elasticClient.indices.create({index});
-            } catch (error) {
-                throw new Error(error);
-            }
-            try {
-                await elasticClient.indices.putMapping({
-                    index,
-                    body: mappings.mappings,
-                });
-            } catch (error) {
-                throw new Error(error.meta.body.error.reason);
-            }
-        }
-    }
-}
-
-async function createWalker(paths) {
-    const walk = require('walk');
-    const log = require('ulog')('indexer');
-    const path = require('path');
-    const basePath = __dirname.match('node_modules/multiprocessing/build')
-        ? path.join(__dirname, '../', '../', '../')
-        : path.join(__dirname, '../', '../');
-    const CRATE_TOOLS = require(`${basePath}/ro-crate-tools`);
-    const {Client} = require('@elastic/elasticsearch');
-    const {pathExists, readJson} = require('fs-extra');
-
-    const args = paths[0].args;
-    log.level = log[args.logLevel.toUpperCase()];
-
-    const elasticClient = new Client({
-        node: args.search,
-        auth: {
-            username: args.username,
-            password: args.password,
-        },
-    });
-    const ocflRoot = args.source;
-    let crateTools;
-    for (let p of paths) {
-        const folder = p.folder;
-        log.info(`Walking '${folder}'`);
-        await new Promise(async resolve => {
-            let walker = walk.walk(folder, {});
-
-            walker.on('file', async (root, fileStats, next) => {
-                switch (fileStats.name) {
-                    case '0=ocfl_object_1.0':
-                        log.info(`Processing crate at: `, root);
-                        const objectPath = root.replace(ocflRoot, '');
-                        crateTools = new CRATE_TOOLS({
-                            ocflRoot: ocflRoot,
-                            objectPath: objectPath,
-                        });
-                        try {
-                            // load the latest crate
-                            let {
-                                flattenedCrate,
-                                objectifiedCrate,
-                            } = await crateTools.loadLatestCrate();
-                            // console.log(JSON.stringify(objectifiedCrate, null, 2));
-
-                            // validate it
-                            const {valid, domain} = await crateTools.validate(
-                                {}
-                            );
-                            if (!valid) {
-                                log.error(
-                                    `Crate @ ${root} is not valid. Skipping it!`
-                                );
-                                return;
-                            }
-
-                            objectifiedCrate = await crateTools.compact();
-                            // console.log(
-                            //     JSON.stringify(objectifiedCrate, null, 2)
-                            // );
-
-                            // run it through any domain transformers
-                            let transformerPath = `${basePath}/tools/indexer/transformers/${domain}/index.js`;
-                            if (await pathExists(transformerPath)) {
-                                const {transformer} = require(transformerPath);
-                                objectifiedCrate = transformer({
-                                    data: objectifiedCrate,
-                                });
-                            }
-                            log.debug(`Setting up index for: `, domain);
-
-                            // create the index if required and load the domain specific mapping if there is one
-                            await createIndexAndLoadMapping({
-                                index: domain,
-                            });
-
-                            // and finally - index the document
-                            log.debug(`Indexing document at path: `, root);
-                            await indexDocument({
-                                index: domain,
-                                data: objectifiedCrate,
-                            });
-                        } catch (error) {
-                            log.error(
-                                `Crate at ${root} has an issue: ${error.message}`
-                            );
-                        }
-                        break;
-                }
-                next();
-            });
-
-            walker.on('errors', (root, nodeStatsArray, next) => {
-                next();
-            });
-
-            walker.on('end', () => {
-                resolve();
-            });
-        });
-    }
-    return;
-
-    async function createIndexAndLoadMapping({index}) {
-        let mappings;
-        let mappingFile = path.join(
-            basePath,
-            'tools/indexer/mappings',
-            index,
-            'mappings.json'
-        );
-        if (await pathExists(mappingFile)) {
-            mappings = await readJson(mappingFile);
-        } else {
-            mappingFile = path.join(
-                basePath,
-                'tools/indexer/mappings/mappings.json'
-            );
-            mappings = await readJson(mappingFile);
-        }
-        try {
-            await elasticClient.indices.get({index});
-        } catch (error) {
-            try {
-                await elasticClient.indices.create({index});
-            } catch (error) {
-                throw new Error(error.meta.body.error.reason);
-            }
-            try {
-                await elasticClient.indices.putMapping({
-                    index,
-                    body: mappings.mappings,
-                });
-            } catch (error) {
-                throw new Error(error.meta.body.error.reason);
-            }
-        }
-    }
-
-    async function indexDocument({data, index}) {
-        data = removeContext({data});
-        // data = refactorGeoShape({data});
-        // console.log(JSON.stringify(data, null, 2));
-        let id = data.identifier.filter(d => d.name === 'hashId')[0].value;
-        // console.info(`Indexing as ${index}/${id}`);
-        try {
-            await elasticClient.index({id, index, body: data});
-        } catch (error) {
-            throw new Error(error.meta.body.error.reason);
-        }
-    }
-
-    function removeContext({data}) {
-        delete data['@context'];
-        return data;
     }
 }

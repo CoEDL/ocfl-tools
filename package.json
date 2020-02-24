@@ -23,7 +23,6 @@
         "fs-extra": "^8.1.0",
         "jsonld": "^1.8.0",
         "lodash": "^4.17.15",
-        "multiprocessing": "^1.2.0",
         "ocfl": "github:marcolarosa/ocfl-js#feature-pdsc",
         "request": "^2.88.0",
         "request-promise-native": "^1.0.7",
