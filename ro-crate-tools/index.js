@@ -73,6 +73,10 @@ class CRATE_TOOLS {
         };
     }
 
+    async getLatestVersion() {
+        return await this.ocflObject.getLatestVersion();
+    }
+
     async getCrate() {
         return {
             flattenedCrate: this.flattenedCrate,

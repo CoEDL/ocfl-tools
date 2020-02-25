@@ -121,6 +121,14 @@
                         }
                     }
                 }
+            },
+            "segment": {
+                "type": "nested",
+                "properties": {
+                    "text": {"type": "text"},
+                    "file": {"type": "text"},
+                    "id": {"type": "text"}
+                }
             }
         }
     }

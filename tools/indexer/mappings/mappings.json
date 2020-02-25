@@ -1,19 +1,71 @@
 {
     "mappings": {
         "properties": {
-            "additionalType": {"type": "keyword"},
             "@context": {"enabled": false},
-            "type": {"enabled": false},
             "id": {"enabled": false},
+            "additionalType": {"type": "keyword"},
             "name": {"type": "text"},
             "description": {"type": "text"},
             "dateCreated": {"type": "date"},
             "dateModified": {"type": "date"},
+            "contributor": {
+                "type": "nested",
+                "properties": {
+                    "name": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    },
+                    "role": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    }
+                }
+            },
             "identifier": {
                 "type": "nested",
                 "properties": {
                     "name": {"type": "keyword"},
                     "value": {"type": "keyword"}
+                }
+            },
+            "hasPart": {
+                "type": "nested",
+                "properties": {
+                    "duration": {"type": "long"},
+                    "contentSize": {"type": "long"},
+                    "bitrate": {"type": "integer"},
+                    "encodingFormat": {"type": "keyword"},
+                    "dateCreated": {"type": "date"},
+                    "dateModified": {"type": "date"}
+                }
+            },
+            "publisher": {
+                "type": "nested",
+                "properties": {
+                    "name": {
+                        "type": "text",
+                        "fields": {
+                            "raw": {
+                                "type": "keyword"
+                            }
+                        }
+                    }
+                }
+            },
+            "segment": {
+                "type": "nested",
+                "properties": {
+                    "text": {"type": "text"},
+                    "file": {"type": "text"},
+                    "id": {"type": "text"}
                 }
             }
         }

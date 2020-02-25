@@ -27,6 +27,7 @@
         "request": "^2.88.0",
         "request-promise-native": "^1.0.7",
         "ro-crate": "github:UTS-eResearch/ro-crate-js#feature/objectify",
+        "transcription-parsers": "github:CoEDL/transcription-parsers.git",
         "ulog": "^1.1.0",
         "walk": "^2.3.14",
         "yargs": "^14.0.0"
