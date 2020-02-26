@@ -190,7 +190,7 @@ async function indexOcflObject({elasticClient, root, ocflRoot}) {
 
 async function indexDocument({elasticClient, data, index}) {
     data = removeContext({data});
-    data.metaType = 'document';
+    data['ocfl:meta:type'] = 'document';
     let id = data.identifier.filter(d => d.name === 'hashId')[0].value;
     // console.info(` as ${index}/${id}`);
     try {
@@ -356,7 +356,7 @@ async function indexSegment({elasticClient, domain, doc}) {
             id: doc.identifier,
             index: domain,
             body: {
-                metaType: 'segment',
+                'ocfl:meta:type': 'segment',
                 segment: doc.segment,
             },
         });
