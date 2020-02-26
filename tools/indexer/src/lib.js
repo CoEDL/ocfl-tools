@@ -97,18 +97,6 @@ async function createIndexAndLoadMapping({elasticClient, index}) {
     }
 }
 
-async function indexDocument({elasticClient, data, index}) {
-    data = removeContext({data});
-    data.elasticIndexType = 'document';
-    let id = data.identifier.filter(d => d.name === 'hashId')[0].value;
-    // console.info(` as ${index}/${id}`);
-    try {
-        await elasticClient.index({id, index, body: data});
-    } catch (error) {
-        throw new Error(error.meta.body.error.reason);
-    }
-}
-
 function removeContext({data}) {
     delete data['@context'];
     return data;
@@ -200,6 +188,18 @@ async function indexOcflObject({elasticClient, root, ocflRoot}) {
     }
 }
 
+async function indexDocument({elasticClient, data, index}) {
+    data = removeContext({data});
+    data.metaType = 'document';
+    let id = data.identifier.filter(d => d.name === 'hashId')[0].value;
+    // console.info(` as ${index}/${id}`);
+    try {
+        await elasticClient.index({id, index, body: data});
+    } catch (error) {
+        throw new Error(error.meta.body.error.reason);
+    }
+}
+
 async function indexTranscriptions({
     elasticClient,
     objectifiedCrate,
@@ -256,18 +256,7 @@ async function indexTranscriptions({
                 };
             });
             for (let doc of docs) {
-                try {
-                    await elasticClient.index({
-                        id: doc.identifier,
-                        index: domain,
-                        body: {
-                            elasticIndexType: 'segment',
-                            segment: doc.segment,
-                        },
-                    });
-                } catch (error) {
-                    throw new Error(error.meta.body.error.reason);
-                }
+                await indexSegment({elasticClient, domain, doc});
             }
         }
 
@@ -358,5 +347,20 @@ async function indexTranscriptions({
             segments = flattenDeep(segments);
             return segments;
         }
+    }
+}
+
+async function indexSegment({elasticClient, domain, doc}) {
+    try {
+        await elasticClient.index({
+            id: doc.identifier,
+            index: domain,
+            body: {
+                metaType: 'segment',
+                segment: doc.segment,
+            },
+        });
+    } catch (error) {
+        throw new Error(error.meta.body.error.reason);
     }
 }
