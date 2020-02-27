@@ -35,19 +35,25 @@ async function createWalker({paths, idx}) {
             walker.on('file', async (root, fileStats, next) => {
                 switch (fileStats.name) {
                     case '0=ocfl_object_1.0':
-                        const crateTools = await indexOcflObject({
-                            elasticClient,
-                            root,
-                            ocflRoot,
-                        });
-                        const state = (await crateTools.getLatestVersion())
-                            .state;
-                        indexTranscriptions({
-                            elasticClient,
-                            objectifiedCrate: crateTools.objectifiedCrate,
-                            root,
-                            state,
-                        });
+                        try {
+                            const crateTools = await indexOcflObject({
+                                elasticClient,
+                                root,
+                                ocflRoot,
+                            });
+                            const state = (await crateTools.getLatestVersion())
+                                .state;
+                            indexTranscriptions({
+                                elasticClient,
+                                objectifiedCrate: crateTools.objectifiedCrate,
+                                root,
+                                state,
+                            });
+                        } catch (error) {
+                            log.error(
+                                `Crate at ${root} has an issue: ${error.message}`
+                            );
+                        }
                         break;
                 }
                 next();
@@ -134,59 +140,50 @@ async function indexOcflObject({elasticClient, root, ocflRoot}) {
         ocflRoot: ocflRoot,
         objectPath: objectPath,
     });
-    try {
-        // load the latest crate
-        let {
-            flattenedCrate,
-            objectifiedCrate,
-        } = await crateTools.loadLatestCrate();
-        // console.log(JSON.stringify(objectifiedCrate, null, 2));
+    // load the latest crate
+    let {flattenedCrate, objectifiedCrate} = await crateTools.loadLatestCrate();
+    // console.log(JSON.stringify(objectifiedCrate, null, 2));
 
-        // validate it
-        const {valid, domain} = await crateTools.validate({});
-        if (!valid) {
-            log.error(`Crate @ ${root} is not valid. Skipping it!`);
-            return;
-        }
+    // validate it
+    const {valid, domain} = await crateTools.validate({});
+    if (!valid) {
+        throw new Error(`Crate @ ${root} is not valid. Skipping it!`);
+    }
 
-        objectifiedCrate = await crateTools.compact();
-        // console.log(
-        //     JSON.stringify(objectifiedCrate, null, 2)
-        // );
+    objectifiedCrate = await crateTools.compact();
+    // console.log(
+    //     JSON.stringify(objectifiedCrate, null, 2)
+    // );
 
-        // run it through any domain transformers
-        let transformerPath = path.join(
-            __dirname,
-            '../transformers/',
-            domain,
-            'index.js'
-        );
-        if (await pathExists(transformerPath)) {
-            const {transformer} = require(transformerPath);
-            objectifiedCrate = transformer({
-                data: objectifiedCrate,
-            });
-        }
-
-        // create the index if required and load the domain specific mapping if there is one
-        log.debug(`Setting up index for: `, domain);
-        await createIndexAndLoadMapping({
-            elasticClient,
-            index: domain,
-        });
-
-        // and finally - index the document
-        log.debug(`Indexing document at path: `, root);
-        await indexDocument({
-            elasticClient,
-            index: domain,
+    // run it through any domain transformers
+    let transformerPath = path.join(
+        __dirname,
+        '../transformers/',
+        domain,
+        'index.js'
+    );
+    if (await pathExists(transformerPath)) {
+        const {transformer} = require(transformerPath);
+        objectifiedCrate = transformer({
             data: objectifiedCrate,
         });
-        return crateTools;
-    } catch (error) {
-        console.log(error);
-        log.error(`Crate at ${root} has an issue: ${error.message}`);
     }
+
+    // create the index if required and load the domain specific mapping if there is one
+    log.debug(`Setting up index for: `, domain);
+    await createIndexAndLoadMapping({
+        elasticClient,
+        index: domain,
+    });
+
+    // and finally - index the document
+    log.debug(`Indexing document at path: `, root);
+    await indexDocument({
+        elasticClient,
+        index: domain,
+        data: objectifiedCrate,
+    });
+    return crateTools;
 }
 
 async function indexDocument({elasticClient, data, index}) {
