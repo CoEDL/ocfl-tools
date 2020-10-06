@@ -12,7 +12,7 @@ const context = JSON.parse(
     readFileSync(path.join(__dirname, './jsonldcontext.jsonld'))
 );
 const {ROCrate} = require('ro-crate');
-const {OcflObject} = require('ocfl');
+const {OcflObject} = require('@coedl/ocfl');
 const schemaPath = './json-validation-schema';
 const log = require('ulog')('crate-tools');
 
@@ -57,7 +57,7 @@ class CRATE_TOOLS {
             crate = state['ro-crate-metadata.jsonld'].pop();
         } else {
             crate = state['ro-crate-metadata.jsonld'].filter(
-                v => v.version === crateVersion
+                (v) => v.version === crateVersion
             );
         }
         let crateFilePath = this.ocflObject.resolveFilePath({
@@ -73,10 +73,6 @@ class CRATE_TOOLS {
         };
     }
 
-    async getLatestVersion() {
-        return await this.ocflObject.getLatestVersion();
-    }
-
     async getCrate() {
         return {
             flattenedCrate: this.flattenedCrate,
@@ -88,7 +84,7 @@ class CRATE_TOOLS {
         let verified = true;
         const data = {...this.objectifiedCrate};
         let domain = data.identifier.filter(
-            i => i.name && i.name[0] === 'domain'
+            (i) => i.name && i.name[0] === 'domain'
         );
         if (!domain.length) {
             domain = 'default';

@@ -25,7 +25,6 @@ it('paradisec.org.au example: should create a domain index, load the mapping for
         {
             folder: './test-data/ocfl-object-1',
             args: {
-                _: [Array],
                 search: elasticService,
                 username: elasticUsername,
                 password: elasticPassword,
@@ -37,7 +36,7 @@ it('paradisec.org.au example: should create a domain index, load the mapping for
             },
         },
     ];
-    await createWalker(paths);
+    await createWalker({paths});
 
     const options = {
         method: 'GET',
@@ -55,7 +54,7 @@ it('paradisec.org.au example: should create a domain index, load the mapping for
     result = JSON.parse(await rp(options));
     expect(Object.keys(result)).toEqual(['paradisec.org.au']);
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
     options.uri = `${elasticService}/_search`;
     result = JSON.parse(await rp(options));
@@ -68,7 +67,6 @@ it('uts.edu.au example: should fail to create a domain index, load the mapping f
         {
             folder: './test-data/ocfl-object-5',
             args: {
-                _: [Array],
                 search: elasticService,
                 username: elasticUsername,
                 password: elasticPassword,
@@ -80,7 +78,7 @@ it('uts.edu.au example: should fail to create a domain index, load the mapping f
             },
         },
     ];
-    await createWalker(paths);
+    await createWalker({paths});
 
     const options = {
         method: 'GET',

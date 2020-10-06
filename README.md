@@ -1,14 +1,14 @@
 # OCFL-Tools
 
--   [OCFL-Tools](#ocfl-tools)
-    -   [About](#about)
-    -   [Setup](#setup)
-    -   [Developing the tools](#developing-the-tools)
-    -   [Adding a new tool](#adding-a-new-tool)
-    -   [Getting to the tool help](#getting-to-the-tool-help)
-        -   [Tool Readme](#tool-readme)
-    -   [Running the tests](#running-the-tests)
-    -   [Minimum requirements of an RO-Crate](#minimum-requirements-of-an-ro-crate)
+- [OCFL-Tools](#ocfl-tools)
+  - [About](#about)
+  - [Setup](#setup)
+  - [Developing the tools](#developing-the-tools)
+  - [Adding a new tool](#adding-a-new-tool)
+  - [Getting to the tool help](#getting-to-the-tool-help)
+    - [Tool Readme](#tool-readme)
+  - [Running the tests](#running-the-tests)
+  - [Minimum requirements of an RO-Crate](#minimum-requirements-of-an-ro-crate)
 
 ## About
 
@@ -69,20 +69,29 @@ Each tool should have it's own README.md that describes how to use it and any ot
 
 ## Running the tests
 
+Start and elastic search docker container:
+
+```
+> docker compose up -d
+```
+
+Run the tests
+
 ```
 > npm run tests
 ```
 
-OR to get a coverage report
+OR Run the tests in watch mode
 
 ```
-> npm run tess-with-coverage
+> npm run test:watch
 ```
 
-OR to do it via a GUI
+Shut down the elastic container
 
 ```
-> npm run majestic
+> docker compose stop
+> docker compose rm -f
 ```
 
 ## Minimum requirements of an RO-Crate

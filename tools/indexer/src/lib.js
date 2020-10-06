@@ -29,7 +29,7 @@ async function createWalker({paths, idx}) {
     for (let p of paths) {
         const folder = p.folder;
         log.info(`Walking '${folder}'`);
-        await new Promise(async resolve => {
+        await new Promise(async (resolve) => {
             let walker = walk.walk(folder, {});
 
             walker.on('file', async (root, fileStats, next) => {
@@ -189,7 +189,7 @@ async function indexOcflObject({elasticClient, root, ocflRoot}) {
 async function indexDocument({elasticClient, data, index}) {
     data = removeContext({data});
     data[`${indexerMetadataNamespace}:type`] = 'document';
-    let id = data.identifier.filter(d => d.name === 'hashId')[0].value;
+    let id = data.identifier.filter((d) => d.name === 'hashId')[0].value;
     // console.info(` as ${index}/${id}`);
     try {
         await elasticClient.index({id, index, body: data});
@@ -206,13 +206,13 @@ async function indexTranscriptions({
 }) {
     const transcriptionExtensions = ['eaf', 'trs', 'ixt', 'flextext'];
     const objectId = objectifiedCrate.identifier.filter(
-        i => i.name && i.name[0] === 'id'
+        (i) => i.name && i.name[0] === 'id'
     )[0].value[0];
     const hashId = objectifiedCrate.identifier.filter(
-        i => i.name && i.name[0] === 'hashId'
+        (i) => i.name && i.name[0] === 'hashId'
     )[0].value[0];
     const domain = objectifiedCrate.identifier.filter(
-        i => i.name && i.name[0] === 'domain'
+        (i) => i.name && i.name[0] === 'domain'
     )[0].value[0];
 
     let result, segments;
@@ -238,14 +238,14 @@ async function indexTranscriptions({
                     break;
             }
 
-            segments = segments.map(s => {
+            segments = segments.map((s) => {
                 return {
                     ...s,
                     identifier: objectId,
                     file: file.path.split('/').pop(),
                 };
             });
-            let docs = segments.map(segment => {
+            let docs = segments.map((segment) => {
                 return {
                     identifier: `${hashId}-${file.path.split('/').pop()}-${
                         segment.timeBegin
@@ -271,10 +271,10 @@ async function indexTranscriptions({
         }
 
         function extractEAFSegments({result}) {
-            let segments = result.timeslots.children.map(timeslot => {
-                return timeslot.children.map(annotation => {
+            let segments = result.timeslots.children.map((timeslot) => {
+                return timeslot.children.map((annotation) => {
                     let text = `${annotation.value} ${annotation.children
-                        .map(c => c.value)
+                        .map((c) => c.value)
                         .join(' ')}`;
 
                     return {
@@ -289,9 +289,9 @@ async function indexTranscriptions({
         }
 
         function extractTRSSegments({result}) {
-            let segments = result.segments.episodes.map(episode => {
-                return episode.sections.map(section => {
-                    return section.turns.map(turn => {
+            let segments = result.segments.episodes.map((episode) => {
+                return episode.sections.map((section) => {
+                    return section.turns.map((turn) => {
                         return {
                             text: turn.text,
                             timeBegin: turn.time.begin,
@@ -305,12 +305,12 @@ async function indexTranscriptions({
         }
 
         function extractIXTSegments({result}) {
-            let segments = result.segments.phrases.map(phrase => {
+            let segments = result.segments.phrases.map((phrase) => {
                 let text = [
                     phrase.transcription,
                     phrase.translation,
-                    ...phrase.words.map(w => {
-                        return w.morphemes.map(m => m.text);
+                    ...phrase.words.map((w) => {
+                        return w.morphemes.map((m) => m.text);
                     }),
                 ];
                 text = flattenDeep(text);
@@ -325,13 +325,13 @@ async function indexTranscriptions({
         }
 
         function extractFlextextSegments({result}) {
-            let segments = result.segments.paragraphs.map(paragraph => {
-                return paragraph.phrases.map(phrase => {
+            let segments = result.segments.paragraphs.map((paragraph) => {
+                return paragraph.phrases.map((phrase) => {
                     let text = [
                         phrase.transcription.text,
                         phrase.translation.text,
-                        ...phrase.words.map(word =>
-                            word.morphemes.map(m => m.text)
+                        ...phrase.words.map((word) =>
+                            word.morphemes.map((m) => m.text)
                         ),
                     ];
                     text = flattenDeep(text);

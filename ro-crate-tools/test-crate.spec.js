@@ -11,7 +11,7 @@ test('test crate can be instantiated', async () => {
     });
     expect(crateTools.objectPath).toBe('ocfl-object-1');
     expect(crateTools.ocflObject.ocflRoot).toBe(
-        '/Users/mlarosa/src/pdsc/ocfl-tools/test-data/'
+        '/Users/mlarosa/src/pdsc/ocfl-tools/test-data'
     );
 });
 
@@ -46,7 +46,9 @@ test('getting a compacted crate', async () => {
     const crate = await crateTools.loadLatestCrate();
     const {valid, domain} = await crateTools.validate({});
     const compactedCrate = await crateTools.compact();
-    const identifierValues = compactedCrate.identifier.map(i => i.value).sort();
+    const identifierValues = compactedCrate.identifier
+        .map((i) => i.value)
+        .sort();
     expect(identifierValues).toEqual([
         '/paradisec.org.au/AC1/001',
         '001',
