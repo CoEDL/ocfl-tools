@@ -49,22 +49,28 @@ class CRATE_TOOLS {
             state = (await this.ocflObject.getVersion({version: ocflVersion}))
                 .state;
         }
-        if (!state['ro-crate-metadata.jsonld'])
+        if (
+            !state['ro-crate-metadata.jsonld'] &&
+            !state['ro-crate-metadata.json']
+        ) {
             throw new Error(
-                `The OCFL object does not have a crate file called 'ro-crate-metadata.jsonld'`
+                `The OCFL object does not have a crate file called 'ro-crate-metadata.{jsonld,json}'`
             );
+        }
+        const crateFile = state['ro-crate-metadata.json']
+            ? 'ro-crate-metadata.json'
+            : 'ro-crate-metadata.jsonld';
+
         if (crateVersion === 'latest') {
-            crate = state['ro-crate-metadata.jsonld'].pop();
+            crate = state[crateFile].pop();
         } else {
-            crate = state['ro-crate-metadata.jsonld'].filter(
-                (v) => v.version === crateVersion
-            );
+            crate = state[crateFile].filter((v) => v.version === crateVersion);
         }
         let crateFilePath = this.ocflObject.resolveFilePath({
             filePath: crate.path,
         });
-        this.flattenedCrate = await readJson(crateFilePath);
-        const rocrate = new ROCrate(this.flattenedCrate);
+        crate = await readJson(crateFilePath);
+        const rocrate = new ROCrate(crate);
         await rocrate.objectify();
         this.objectifiedCrate = rocrate.objectified;
         return {
@@ -82,6 +88,7 @@ class CRATE_TOOLS {
 
     async validate({verbose}) {
         let verified = true;
+        // console.log(JSON.stringify(this.objectifiedCrate, null, 2));
         const data = {...this.objectifiedCrate};
         let domain = data.identifier.filter(
             (i) => i.name && i.name[0] === 'domain'
