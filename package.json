@@ -17,7 +17,8 @@
     "author": "Marco La Rosa",
     "license": "ISC",
     "dependencies": {
-        "@coedl/ocfl": "^2.2.0",
+        "@coedl/ocfl": "^2.3.1",
+        "@coedl/transcription-parsers": "^1.2.3",
         "@elastic/elasticsearch": "^7.9.0",
         "ajv": "^6.12.5",
         "extract-zip": "^2.0.1",
@@ -26,8 +27,7 @@
         "lodash": "^4.17.20",
         "request": "^2.88.2",
         "request-promise-native": "^1.0.9",
-        "ro-crate": "^1.4.3",
-        "transcription-parsers": "github:CoEDL/transcription-parsers.git",
+        "ro-crate": "^1.5.0",
         "ulog": "^2.0.0-beta.7",
         "walk": "^2.3.14",
         "yargs": "^16.0.3"
