@@ -61,16 +61,19 @@ async function indexer(args) {
     } else {
         let paths = await readDirectory(args.source);
         log.info(`Indexing OCFL content in: ${args.source}`);
-        paths = paths.filter(p => {
+        paths = paths.filter((p) => {
             const isdir = statSync(path.join(args.source, p)).isDirectory();
             return p != 'deposit' && isdir;
         });
-        paths = paths.map(p => {
-            return {
-                folder: path.join(args.source, p),
-                args,
-            };
-        });
+        paths = paths
+            .map((p) => {
+                return {
+                    folder: path.join(args.source, p),
+                    args,
+                };
+            })
+            .filter((p) => !p.folder.match('deposit'))
+            .filter((p) => !p.folder.match('backup'));
         if (paths.length < args.walkers) {
             paths = chunk(paths, 1);
         } else {
