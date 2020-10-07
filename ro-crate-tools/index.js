@@ -70,6 +70,25 @@ class CRATE_TOOLS {
             filePath: crate.path,
         });
         crate = await readJson(crateFilePath);
+        crate = await readJson(crateFilePath);
+
+        // swap old root dataset pointer for new if required
+        let graph = crate['@graph'];
+        graph = graph.map((e) => {
+            if (e['@id'] === '/ro-crate-metadata.jsonld') {
+                return {
+                    '@type': 'CreativeWork',
+                    '@id': 'ro-crate-metadata.json',
+                    conformsTo: {
+                        '@id': 'https://w3id.org/ro/crate/1.1-DRAFT',
+                    },
+                    about: {'@id': './'},
+                };
+            } else {
+                return e;
+            }
+        });
+        crate['@graph'] = graph;
         const rocrate = new ROCrate(crate);
         await rocrate.objectify();
         this.objectifiedCrate = rocrate.objectified;
