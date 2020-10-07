@@ -258,7 +258,7 @@ async function indexTranscriptions({
                     await indexSegment({elasticClient, domain, doc});
                 }
             } catch (error) {
-                console.log(error.message);
+                console.log(`ERROR: ${error.message}`);
             }
         }
 
