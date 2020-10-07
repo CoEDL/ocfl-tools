@@ -57,7 +57,7 @@ async function indexer(args) {
                 args,
             },
         ];
-        await createWalker({paths, idx});
+        await createWalker({paths, idx: 1});
     } else {
         let paths = await readDirectory(args.source);
         log.info(`Indexing OCFL content in: ${args.source}`);

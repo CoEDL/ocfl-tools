@@ -220,7 +220,7 @@ async function indexTranscriptions({
         const extension = file.split('.').pop();
         if (transcriptionExtensions.includes(extension)) {
             file = state[file].pop();
-            log.debug(`Processing transcription at: `, root, file.path);
+            log.debug(`Processing transcription ${root}/${file.path}`);
             try {
                 result = await parseTranscription({root, file});
 
@@ -258,7 +258,9 @@ async function indexTranscriptions({
                     await indexSegment({elasticClient, domain, doc});
                 }
             } catch (error) {
-                console.log(`ERROR: ${error.message}`);
+                console.log(
+                    `ERROR: processing transcription: ${error.message} ${root}/${file.path}`
+                );
             }
         }
 
