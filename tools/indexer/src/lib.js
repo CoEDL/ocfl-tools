@@ -6,7 +6,7 @@ const walk = require('walk');
 const log = require('ulog')('indexer');
 const {pathExists, readJson} = require('fs-extra');
 const CRATE_TOOLS = require(`../../../ro-crate-tools`);
-const {Parser} = require('transcription-parsers');
+const {Parser} = require('@coedl/transcription-parsers');
 const indexerMetadataNamespace = 'ocfl-indexer:meta';
 
 module.exports = {
@@ -50,6 +50,7 @@ async function createWalker({paths, idx}) {
                                 state,
                             });
                         } catch (error) {
+                            console.log(error);
                             log.error(
                                 `Crate at ${root} has an issue: ${error.message}`
                             );
@@ -142,7 +143,6 @@ async function indexOcflObject({elasticClient, root, ocflRoot}) {
     });
     // load the latest crate
     let {flattenedCrate, objectifiedCrate} = await crateTools.loadLatestCrate();
-    // console.log(JSON.stringify(objectifiedCrate, null, 2));
 
     // validate it
     const {valid, domain} = await crateTools.validate({});
@@ -221,40 +221,44 @@ async function indexTranscriptions({
         if (transcriptionExtensions.includes(extension)) {
             file = state[file].pop();
             log.debug(`Processing transcription at: `, root, file.path);
-            result = await parseTranscription({root, file});
+            try {
+                result = await parseTranscription({root, file});
 
-            switch (extension) {
-                case 'eaf':
-                    segments = extractEAFSegments({result});
-                    break;
-                case 'trs':
-                    segments = extractTRSSegments({result});
-                    break;
-                case 'ixt':
-                    segments = extractIXTSegments({result});
-                    break;
-                case 'flextext':
-                    segments = extractFlextextSegments({result});
-                    break;
-            }
+                switch (extension) {
+                    case 'eaf':
+                        segments = extractEAFSegments({result});
+                        break;
+                    case 'trs':
+                        segments = extractTRSSegments({result});
+                        break;
+                    case 'ixt':
+                        segments = extractIXTSegments({result});
+                        break;
+                    case 'flextext':
+                        segments = extractFlextextSegments({result});
+                        break;
+                }
 
-            segments = segments.map((s) => {
-                return {
-                    ...s,
-                    identifier: objectId,
-                    file: file.path.split('/').pop(),
-                };
-            });
-            let docs = segments.map((segment) => {
-                return {
-                    identifier: `${hashId}-${file.path.split('/').pop()}-${
-                        segment.timeBegin
-                    }`,
-                    segment,
-                };
-            });
-            for (let doc of docs) {
-                await indexSegment({elasticClient, domain, doc});
+                segments = segments.map((s) => {
+                    return {
+                        ...s,
+                        identifier: objectId,
+                        file: file.path.split('/').pop(),
+                    };
+                });
+                let docs = segments.map((segment) => {
+                    return {
+                        identifier: `${hashId}-${file.path.split('/').pop()}-${
+                            segment.timeBegin
+                        }`,
+                        segment,
+                    };
+                });
+                for (let doc of docs) {
+                    await indexSegment({elasticClient, domain, doc});
+                }
+            } catch (error) {
+                console.log(error.message);
             }
         }
 
