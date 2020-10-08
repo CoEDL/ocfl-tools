@@ -246,6 +246,7 @@ async function indexTranscriptions({
                         file: file.path.split('/').pop(),
                     };
                 });
+
                 let docs = segments.map((segment) => {
                     return {
                         identifier: `${hashId}-${file.path.split('/').pop()}-${
@@ -261,6 +262,9 @@ async function indexTranscriptions({
                 console.log(
                     `ERROR: processing transcription: ${error.message} ${root}/${file.path}`
                 );
+                if (error.message !== 'No timeslots found in file') {
+                    console.log(error);
+                }
             }
         }
 
@@ -297,6 +301,7 @@ async function indexTranscriptions({
         function extractTRSSegments({result}) {
             let segments = result.segments.episodes.map((episode) => {
                 return episode.sections.map((section) => {
+                    if (!section.turns) return [];
                     return section.turns.map((turn) => {
                         return {
                             text: turn.text,
@@ -306,7 +311,11 @@ async function indexTranscriptions({
                     });
                 });
             });
-            segments = flattenDeep(segments);
+            if (segments) {
+                segments = flattenDeep(segments);
+            } else {
+                segments = [];
+            }
             return segments;
         }
 
@@ -335,7 +344,7 @@ async function indexTranscriptions({
                 return paragraph.phrases.map((phrase) => {
                     let text = [
                         phrase.transcription.text,
-                        phrase.translation.text,
+                        phrase.translation ? phrase.translation.text : '',
                         ...phrase.words.map((word) =>
                             word.morphemes.map((m) => m.text)
                         ),
