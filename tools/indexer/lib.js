@@ -390,8 +390,7 @@ async function indexTranscriptions({
         segments = segments.map((s) => {
             return {
                 ...s,
-                resource: `${documentIdentifier}`,
-                identifier: itemIdentifier,
+                resource: `${itemIdentifier}`,
                 ocflVersion: ocflVersion,
                 file: file.name,
             };
@@ -400,8 +399,8 @@ async function indexTranscriptions({
         let documents = segments.map((segment) => {
             return {
                 id: `${documentIdentifier}-${file['@id']}-${segment.timeBegin}`,
-                segment,
                 [`${indexerMetadataNamespace}:type`]: 'segment',
+                ...segment,
             };
         });
 
