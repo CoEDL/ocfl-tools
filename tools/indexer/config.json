@@ -1,0 +1,28 @@
+{
+    "ocfl": {
+        "repository": "/Users/mlarosa/src/pdsc/data/ocfl-repository/repository",
+        "scratch": "/Users/mlarosa/src/pdsc/data/ocfl-repository/scratch"
+    },
+    "search": {
+        "host": "http://localhost:9200",
+        "username": "indexer",
+        "password": "somerandompassword"
+    },
+    "domains": {
+        "paradisec.org.au": {
+            "indexAs": "pages",
+            "include": [
+                "Dataset",
+                "Language",
+                "Country",
+                "Place",
+                "Person",
+                "Organization",
+                "FieldOfResearch"
+            ]
+        },
+        "criminalcharacters.org.au": {
+            "indexAs": "entities"
+        }
+    }
+}

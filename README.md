@@ -5,7 +5,6 @@
   - [Setup](#setup)
   - [Developing the tools](#developing-the-tools)
   - [Adding a new tool](#adding-a-new-tool)
-  - [Getting to the tool help](#getting-to-the-tool-help)
     - [Tool Readme](#tool-readme)
   - [Running the tests](#running-the-tests)
   - [Minimum requirements of an RO-Crate](#minimum-requirements-of-an-ro-crate)
@@ -13,8 +12,6 @@
 ## About
 
 This repository contains a set of tools for working with, interacting with and manipulating OCFL objects in a repository.
-
-The over-arching tool `ocfl-tools.js` is the parent of a set of subcommands that each have their own code and configuration in the `tools` folder. See the individual README.md files in the tool folders for information about that specific tool.
 
 ## Setup
 
@@ -27,41 +24,9 @@ Developing the tools first requires that you start the required docker container
 ## Adding a new tool
 
 -   Create a folder in `./tools` named as the tool
--   Add an `index.js` that exports an object like:
-    ```
-    module.exports = {
-      command: 'validate-crate',
-      description: 'Validate an RO-Crate',
-      builder: {
-          'path-to-object': {
-              demandOption: true,
-              describe:
-                  'The path to a single OCFL object containing an RO-Crate.',
-              type: 'string',
-          },
-      },
-      handler: async args => {
-          // the code for the tool
-      },
-    }
-    ```
--   Look at `tools/validate-crate` for a simple example and `tools/indexer` for a more complex, multiprocessing example.
+-   Create your tool. Follow `indexer` for an example.
 
 See [http://yargs.js.org/docs/](http://yargs.js.org/docs/) for option documentation.
-
-## Getting to the tool help
-
-To see the help for the parent tool run:
-
-```
-./node_modules/.bin/babel-node ocfl-tools.js --help
-```
-
-And to see the help for a specific tool (e.g. the indexer)
-
-```
-./node_modules/.bin/babel-node ocfl-tools.js indexer --help
-```
 
 ### Tool Readme
 
