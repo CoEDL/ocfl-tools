@@ -367,6 +367,7 @@ async function indexTranscriptions({
             log.error(`${file['@id']} not found in the object at ${hashId}`);
             continue;
         }
+        filePath = object.resolveFilePath({filePath});
 
         log.debug(`Processing transcription ${filePath}`);
         try {
@@ -537,7 +538,7 @@ async function indexTranscriptions({
                 }
             );
             filePath = flattenDeep(filePath)[0];
-            return object.resolveFilePath({filePath});
+            return filePath;
         }
     }
 }
