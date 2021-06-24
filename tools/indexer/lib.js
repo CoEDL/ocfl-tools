@@ -12,6 +12,10 @@ const indexerMetadataNamespace = 'ocfl-indexer:meta';
 const {Repository} = require('@coedl/ocfl');
 
 const ignorePropertyResolution = ['@type', 'hasMember', 'memberOf'];
+const roCrateMetadataFile = [
+    'ro-crate-metadata.json',
+    'ro-crate-metadata.jsonld',
+];
 
 module.exports = {
     getDomainIdentifier,
@@ -160,63 +164,74 @@ async function processOcflObject({log, configuration, object}) {
 
     //  get the inventory file in the root
     let inventory = await object.getLatestInventory();
-    for (let ocflVersion of Object.keys(inventory.versions)) {
-        // for each version in the object
-        let rocrate;
-        try {
-            const crateFile = await object.resolveFilePath({
-                filePath: `${ocflVersion}/content/ro-crate-metadata.json`,
+    const ocflVersion = inventory.head;
+
+    //  locate the ro crate file and load it
+    let roCrateFile = Object.entries(inventory.manifest).map(
+        ([hash, paths]) => {
+            return paths.filter((p) => {
+                p = basename(p);
+                return roCrateMetadataFile.includes(p);
             });
-            rocrate = await readJSON(crateFile);
-        } catch (error) {
-            console.log(error);
-            console.error(
-                `There was an issue loading the crate file for version '${ocflVersion}'`
-            );
-            continue;
         }
+    );
+    roCrateFile = flattenDeep(roCrateFile)[0];
+    // for each version in the object
+    let rocrate;
 
-        // load the crate
-        const crate = new ROCrate(rocrate);
-        crate.index();
-
-        let {domain} = getDomainIdentifier(crate);
-
-        if (!configuration.domains[domain]) {
-            configuration.domains[domain] = getDefaultDomainConfiguration();
-        }
-
-        const elasticClient = await getElasticClient({
-            host: configuration.search.host,
-            username: configuration.search.username,
-            password: configuration.search.password,
+    try {
+        const crateFile = await object.resolveFilePath({
+            filePath: roCrateFile,
         });
-        // set up the index
-        await createIndexAndLoadMapping({
-            elasticClient,
-            index: domain,
-            configuration: configuration.domains[domain],
-        });
-
-        // index the data in the crate file
-        await indexDocument({
-            elasticClient,
-            log,
-            configuration: configuration.domains[domain],
-            ocflVersion,
-            index: domain,
-            crate,
-        });
-
-        // index any transcription files in the object
-        indexTranscriptions({
-            elasticClient,
-            log,
-            object,
-            crate,
-            ocflVersion,
-        });
+        rocrate = await readJSON(crateFile);
+    } catch (error) {
+        console.log(error);
+        console.error(
+            `There was an issue loading the crate file for version '${ocflVersion}'`
+        );
+        return;
     }
+
+    // load the crate
+    const crate = new ROCrate(rocrate);
+    crate.index();
+
+    let {domain} = getDomainIdentifier(crate);
+
+    if (!configuration.domains[domain]) {
+        configuration.domains[domain] = getDefaultDomainConfiguration();
+    }
+
+    const elasticClient = await getElasticClient({
+        host: configuration.search.host,
+        username: configuration.search.username,
+        password: configuration.search.password,
+    });
+    // set up the index
+    await createIndexAndLoadMapping({
+        elasticClient,
+        index: domain,
+        configuration: configuration.domains[domain],
+    });
+
+    // index the data in the crate file
+    await indexDocument({
+        elasticClient,
+        log,
+        configuration: configuration.domains[domain],
+        ocflVersion,
+        index: domain,
+        crate,
+    });
+
+    // index any transcription files in the object
+    indexTranscriptions({
+        elasticClient,
+        log,
+        ocflVersion,
+        object,
+        crate,
+    });
 }
 
 async function indexDocument({
@@ -318,11 +333,12 @@ function buildDocumentIndex({documentIdentifier, ocflVersion, crate}) {
 async function indexTranscriptions({
     elasticClient,
     log,
+    ocflVersion,
     object,
     crate,
-    ocflVersion,
 }) {
     const transcriptionExtensions = ['eaf', 'trs', 'ixt', 'flextext'];
+
     let files = crate._item_by_type['File'];
     if (!files) return;
     files = files
@@ -346,7 +362,6 @@ async function indexTranscriptions({
         let filePath = await getTranscriptionFilePath({
             object,
             file,
-            version: ocflVersion,
         });
         if (!filePath) {
             log.error(`${file['@id']} not found in the object at ${hashId}`);
@@ -513,36 +528,16 @@ async function indexTranscriptions({
             return segments;
         }
 
-        async function getTranscriptionFilePath({object, file, version}) {
-            let filePath;
-            //  try to get the specific version
-            try {
-                filePath = join(
-                    object.repositoryPath,
-                    version,
-                    'content',
-                    file['@id']
-                );
-                if ((await stat(filePath)).isFile()) {
-                    return filePath;
-                }
-            } catch (error) {}
+        async function getTranscriptionFilePath({object, file}) {
+            let inventory = await object.getLatestInventory();
 
-            // if nothing - go back through all versions to find a match
-            let versions = object.versions.map((v) => v.version).reverse();
-            for (let version of versions) {
-                try {
-                    filePath = join(
-                        object.repositoryPath,
-                        version,
-                        'content',
-                        file['@id']
-                    );
-                    if ((await stat(filePath)).isFile()) {
-                        return filePath;
-                    }
-                } catch (error) {}
-            }
+            let filePath = Object.entries(inventory.manifest).map(
+                ([hash, paths]) => {
+                    return paths.filter((p) => p.match(file.name));
+                }
+            );
+            filePath = flattenDeep(filePath)[0];
+            return object.resolveFilePath({filePath});
         }
     }
 }
