@@ -10,7 +10,7 @@ services:
         hostname: search
         environment:
             - node.name=search
-            - discovery.seed_hosts=search
+            - discovery.type=single-node
             - bootstrap.memory_lock=true
             - http.host=0.0.0.0
             - "ES_JAVA_OPTS=-Xms1024m -Xmx1024m"
